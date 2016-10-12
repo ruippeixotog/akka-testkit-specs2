@@ -30,7 +30,7 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 
 licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
-homepage := Some(url("https://github.com/ruippeixotog/scala-scraper"))
+homepage := Some(url("https://github.com/ruippeixotog/akka-testkit-specs2"))
 pomExtra :=
   <scm>
     <url>https://github.com/ruippeixotog/akka-testkit-specs2</url>
