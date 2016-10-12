@@ -1,4 +1,4 @@
-# akka-testkit-specs2
+# akka-testkit-specs2 [![Build Status](https://travis-ci.org/ruippeixotog/akka-testkit-specs2.svg?branch=master)](https://travis-ci.org/ruippeixotog/akka-testkit-specs2) [![Coverage Status](https://coveralls.io/repos/github/ruippeixotog/akka-testkit-specs2/badge.svg?branch=master)](https://coveralls.io/github/ruippeixotog/akka-testkit-specs2?branch=master)
 
 A small library for those who use [akka-testkit](http://doc.akka.io/docs/akka/current/scala/testing.html) in [specs2](http://etorreborre.github.io/specs2/) specifications. Provides idiomatic specs2 matchers for checking the correct reception of messages by test actors and probes, handling the provision and proper termination of test actor systems.
 
