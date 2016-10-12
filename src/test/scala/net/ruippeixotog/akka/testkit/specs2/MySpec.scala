@@ -30,7 +30,7 @@ class MySpec extends AkkaSpecification {
       testActor ! "a"
       this must receive.allOf("a", "b")
 
-      testActor ! "b" // expect a message (possible not the next one)
+      testActor ! "b" // expect a message (possibly not the next one)
       testActor ! "a"
       this must receive("a").afterOthers
 

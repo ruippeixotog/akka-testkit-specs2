@@ -7,7 +7,7 @@ A small library for those who use [akka-testkit](http://doc.akka.io/docs/akka/cu
 To use akka-testkit-specs2 in an existing SBT project with Scala 2.11.x, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "net.ruippeixotog" %% "akka-testkit-sepcs2" % "0.1.0-SNAPSHOT"
+libraryDependencies += "net.ruippeixotog" %% "akka-testkit-specs2" % "0.1.0-SNAPSHOT"
 ```
 
 To use it in your specifications, just extend `AkkaSpecification`:
@@ -55,7 +55,7 @@ class MySpec extends AkkaSpecification {
       testActor ! "a"
       this must receive.allOf("a", "b")
 
-      testActor ! "b" // expect a message (possible not the next one)
+      testActor ! "b" // expect a message (possibly not the next one)
       testActor ! "a"
       this must receive("a").afterOthers
 
