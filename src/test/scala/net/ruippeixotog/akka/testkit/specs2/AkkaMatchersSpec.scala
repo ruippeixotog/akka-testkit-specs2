@@ -144,6 +144,14 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
 
       (probe must receiveWithin(2.seconds)("b")) must beSuccessful
     }
+
+    "define receiveMessage* matchers as synonyms for receive*" in new ProbeTest {
+      probe.ref ! "hello"
+      (probe must receiveMessage("hello")) must beSuccessful
+
+      schedule("hello", 4.seconds)
+      (probe must receiveMessageWithin(5.seconds)("hello")) must beSuccessful
+    }
   }
 
   def afterAll() = shutdown()
