@@ -10,12 +10,12 @@ import org.specs2.specification.SpecificationFeatures
 
 trait AkkaMatchers { this: SpecificationFeatures =>
 
-  def receive = new ReceiveMatcherSet(
+  def receive = new ReceiveMatcherSet[Any](
     _.remainingOrDefault,
     { msg => s"Received message '$msg'" },
     { timeout => s"Timeout ($timeout) while waiting for message" })
 
-  def receiveWithin(max: FiniteDuration) = new ReceiveMatcherSet(
+  def receiveWithin(max: FiniteDuration) = new ReceiveMatcherSet[Any](
     { _ => max },
     { msg => s"Received message '$msg' within $max" },
     { timeout => s"Didn't receive any message within $timeout" })
@@ -23,38 +23,42 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   def receiveMessage = receive
   def receiveMessageWithin(max: FiniteDuration) = receiveWithin(max)
 
-  class ReceiveMatcherSet(
-    timeout: TestKitBase => FiniteDuration,
+  class ReceiveMatcherSet[A: ClassTag](
+      timeout: TestKitBase => FiniteDuration,
       receiveOkMsg: AnyRef => String,
       receiveKoMsg: FiniteDuration => String) extends Matcher[TestKitBase] {
 
     private def getMessage(probe: TestKitBase, timeout: FiniteDuration): Option[AnyRef] =
       Option(probe.receiveOne(timeout))
 
-    def apply[S <: TestKitBase](t: Expectable[S]) = {
-      val msgOpt = getMessage(t.value, timeout(t.value))
-      result(msgOpt.isDefined, receiveOkMsg(msgOpt.getOrElse("")), receiveKoMsg(timeout(t.value)), t)
+    def apply[S <: TestKitBase](t: Expectable[S]) = getMessage(t.value, timeout(t.value)) match {
+      case None => result(false, "", receiveKoMsg(timeout(t.value)), t)
+      case Some(msg) =>
+        val r = beAnInstanceOf[A].check(msg)
+        result(r.isSuccess, s"${receiveOkMsg(msg)} and ${r.message}", s"${receiveOkMsg(msg)} but ${r.message}", t)
     }
 
-    def apply[A: ClassTag](msg: A) = new CheckedMatcher(msg)
-    def which[A: ClassTag, R: AsResult](f: A => R) = new CheckedMatcher(f)
-    def like[A: ClassTag, R: AsResult](f: PartialFunction[A, R]) = new CheckedMatcher(f)
+    def apply[B: ClassTag] = new ReceiveMatcherSet[B](timeout, receiveOkMsg, receiveKoMsg)
 
-    def allOf[A: ClassTag, R: AsResult](msg: A, msgs: A*) = new AllOfMatcher(msg +: msgs)
+    def apply(msg: A) = new CheckedMatcher(msg)
+    def which[R: AsResult](f: A => R) = new CheckedMatcher(f)
+    def like[R: AsResult](f: PartialFunction[A, R]) = new CheckedMatcher(f)
 
-    class CheckedMatcher[A: ClassTag](check: ValueCheck[A]) extends Matcher[TestKitBase] {
+    def allOf[R: AsResult](msg: A, msgs: A*) = new AllOfMatcher(msg +: msgs)
+
+    class CheckedMatcher(check: ValueCheck[A]) extends Matcher[TestKitBase] {
 
       def apply[S <: TestKitBase](t: Expectable[S]) = getMessage(t.value, timeout(t.value)) match {
         case None => result(false, "", receiveKoMsg(timeout(t.value)), t)
         case Some(msg) =>
-          val r = msg must beAnInstanceOf[A] and check.check(msg.asInstanceOf[A])
+          val r = beAnInstanceOf[A].check(msg) and check.check(msg.asInstanceOf[A])
           result(r.isSuccess, s"${receiveOkMsg(msg)} and ${r.message}", s"${receiveOkMsg(msg)} but ${r.message}", t)
       }
 
       def afterOthers = new AfterOthersMatcher(check)
     }
 
-    class AfterOthersMatcher[A: ClassTag](check: ValueCheck[A]) extends Matcher[TestKitBase] {
+    class AfterOthersMatcher(check: ValueCheck[A]) extends Matcher[TestKitBase] {
 
       def apply[S <: TestKitBase](t: Expectable[S]) = {
         def now = System.nanoTime.nanos
@@ -75,7 +79,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
       }
     }
 
-    class AllOfMatcher[A: ClassTag](msgs: Seq[A]) extends Matcher[TestKitBase] {
+    class AllOfMatcher(msgs: Seq[A]) extends Matcher[TestKitBase] {
 
       def apply[S <: TestKitBase](t: Expectable[S]) = {
         def now = System.nanoTime.nanos

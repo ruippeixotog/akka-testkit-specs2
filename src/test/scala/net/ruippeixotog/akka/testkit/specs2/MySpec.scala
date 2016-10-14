@@ -1,9 +1,8 @@
 package net.ruippeixotog.akka.testkit.specs2
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
 import scala.concurrent.duration._
 
-import org.specs2.matcher.MatchResult
+import net.ruippeixotog.akka.testkit.specs2.mutable.AkkaSpecification
 
 class MySpec extends AkkaSpecification {
   // testActor is not thread-safe; use `TestProbe` instances per example when possible!
@@ -18,12 +17,15 @@ class MySpec extends AkkaSpecification {
       testActor ! "hello" // expect a specific message
       this must receive("hello")
 
+      testActor ! "hello" // expect a message of a given type
+      this must receive[String]
+
       testActor ! "hello" // expect a message matching a function
-      this must receive.which { s: String => s must startWith("h") }
+      this must receive[String].which(_ must startWith("h"))
 
       testActor ! Some("hello") // expect a message matching a partial function
-      this must receive.like[Option[String], MatchResult[_]] {
-        case Some(s) => s must startWith("h")
+      this must receive.like {
+        case Some(s: String) => s must startWith("h")
       }
 
       testActor ! "b" // expect several messages, possibly unordered
@@ -38,7 +40,7 @@ class MySpec extends AkkaSpecification {
       this must receiveWithin(1.second)("hello")
 
       testActor ! "hello" // ...and several combinations of the modifiers above
-      this must receiveWithin(1.second).which { s: String => ok }.afterOthers
+      this must receiveWithin(1.second)[String].which(_ must startWith("h")).afterOthers
     }
   }
 }
