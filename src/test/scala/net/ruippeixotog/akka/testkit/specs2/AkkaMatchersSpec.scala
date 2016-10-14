@@ -41,8 +41,19 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receive("hello")) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
 
+    "provide a matcher for receiving a message of a given type" in new ProbeTest {
+
+      probe.ref ! "hello"
+      (probe must receive[String]) must beSuccessful
+      probe.ref ! 0.5
+      (probe must receive[String]) must beFailing(
+        "Received message '0.5' but '0.5: java.lang.Double' is not an instance of 'java.lang.String'")
+      // no message sent
+      (probe must receive[String]) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
+    }
+
     "provide a matcher for receiving messages matching a function" in new ProbeTest {
-      val matchTest = receive.which { s: String => s must startWith("h") }
+      val matchTest = receive[String].which { s => s must startWith("h") }
 
       probe.ref ! "hello"
       (probe must matchTest) must beSuccessful
@@ -56,7 +67,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
     }
 
     "provide a matcher for receiving messages matching a partial function" in new ProbeTest {
-      val matchTest = receive.like[Option[String], MatchResult[_]] {
+      val matchTest = receive[Option[String]].like {
         case Some(s) if s.nonEmpty => s must startWith("h")
         case None => ok
       }
@@ -95,7 +106,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
 
     "provide a matcher for receiving a message, discarding others meanwhile" in new ProbeTest {
       val matchTest = receive("hello").afterOthers
-      val matchTestWhich = receive.which { s: String => s must startWith("h") }.afterOthers
+      val matchTestWhich = receive[String].which { s => s must startWith("h") }.afterOthers
 
       probe.ref ! "hello"
       (probe must matchTest) must beSuccessful
@@ -128,7 +139,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receiveWithin(3.second)("hello")) must beSuccessful
 
       schedule("hello", 4.seconds)
-      (probe must receiveWithin(5.seconds).which { s: String => ok }) must beSuccessful
+      (probe must receiveWithin(5.seconds)[String].which { s => ok }) must beSuccessful
 
       schedule("a", 2.seconds)
       schedule("b", 4.seconds)
@@ -151,6 +162,20 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
 
       schedule("hello", 4.seconds)
       (probe must receiveMessageWithin(5.seconds)("hello")) must beSuccessful
+    }
+
+    "work as expected with untyped function matchers and messages" in new ProbeTest {
+      val matchTest = receive.like {
+        case str: String => str mustEqual "str"
+        case n: Int => n mustEqual 42
+      }
+
+      probe.ref ! "a"
+      (probe must matchTest) must beFailing("Received message 'a' but 'a' is not equal to 'str'")
+      probe.ref ! 41
+      (probe must matchTest) must beFailing("Received message '41' but '41' is not equal to '42'")
+      probe.ref ! None
+      (probe must matchTest) must beFailing("Received message 'None' but undefined function for 'None'")
     }
   }
 
