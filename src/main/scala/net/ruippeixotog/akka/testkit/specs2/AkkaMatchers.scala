@@ -44,7 +44,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
     def which[R: AsResult](f: A => R) = new CheckedMatcher(f)
     def like[R: AsResult](f: PartialFunction[A, R]) = new CheckedMatcher(f)
 
-    def allOf[R: AsResult](msg: A, msgs: A*) = new AllOfMatcher(msg +: msgs)
+    def allOf[R: AsResult](msgs: A*) = new AllOfMatcher(msgs)
 
     class CheckedMatcher(check: ValueCheck[A]) extends Matcher[TestKitBase] {
 
