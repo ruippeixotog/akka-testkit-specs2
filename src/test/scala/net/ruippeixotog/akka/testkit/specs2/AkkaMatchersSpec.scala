@@ -127,6 +127,19 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must matchTestWhich) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
     }
 
+    "allow unwrapping data in envelope-like messages before matching" in new ProbeTest {
+      case class Letter(msg: String)
+      val receiveLetter = receive[Letter].unwrap(_.msg)
+
+      probe.ref ! Letter("hello")
+      (probe must receiveLetter) must beSuccessful
+      probe.ref ! Letter("ohlla")
+      (probe must receiveLetter.which { s => s must startWith("h") }) must
+        beFailing("Received message 'Letter\\(ohlla\\)' but 'ohlla' doesn't start with 'h'")
+      // no message sent
+      (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
+    }
+
     "allow defining a custom timeout for all the matchers" in new ProbeTest {
 
       schedule("hello", 3.seconds)

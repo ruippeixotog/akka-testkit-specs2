@@ -10,23 +10,26 @@ import org.specs2.specification.SpecificationFeatures
 
 trait AkkaMatchers { this: SpecificationFeatures =>
 
-  def receive = new ReceiveMatcherSet[Any](
+  def receive = new ReceiveMatcherSet[Any, Any](
     _.remainingOrDefault,
     { msg => s"Received message '$msg'" },
-    { timeout => s"Timeout ($timeout) while waiting for message" })
+    { timeout => s"Timeout ($timeout) while waiting for message" },
+    identity)
 
-  def receiveWithin(max: FiniteDuration) = new ReceiveMatcherSet[Any](
+  def receiveWithin(max: FiniteDuration) = new ReceiveMatcherSet[Any, Any](
     { _ => max },
     { msg => s"Received message '$msg' within $max" },
-    { timeout => s"Didn't receive any message within $timeout" })
+    { timeout => s"Didn't receive any message within $timeout" },
+    identity)
 
   def receiveMessage = receive
   def receiveMessageWithin(max: FiniteDuration) = receiveWithin(max)
 
-  class ReceiveMatcherSet[A: ClassTag](
+  class ReceiveMatcherSet[A: ClassTag, B](
       timeout: TestKitBase => FiniteDuration,
       receiveOkMsg: AnyRef => String,
-      receiveKoMsg: FiniteDuration => String) extends Matcher[TestKitBase] {
+      receiveKoMsg: FiniteDuration => String,
+      unwrapFunc: A => B) extends Matcher[TestKitBase] {
 
     private def getMessage(probe: TestKitBase, timeout: FiniteDuration): Option[AnyRef] =
       Option(probe.receiveOne(timeout))
@@ -38,27 +41,28 @@ trait AkkaMatchers { this: SpecificationFeatures =>
         result(r.isSuccess, s"${receiveOkMsg(msg)} and ${r.message}", s"${receiveOkMsg(msg)} but ${r.message}", t)
     }
 
-    def apply[B: ClassTag] = new ReceiveMatcherSet[B](timeout, receiveOkMsg, receiveKoMsg)
+    def apply[AA: ClassTag] = new ReceiveMatcherSet[AA, AA](timeout, receiveOkMsg, receiveKoMsg, identity)
+    def unwrap[BB](f: B => BB) = new ReceiveMatcherSet[A, BB](timeout, receiveOkMsg, receiveKoMsg, unwrapFunc.andThen(f))
 
-    def apply(msg: A) = new CheckedMatcher(msg)
-    def which[R: AsResult](f: A => R) = new CheckedMatcher(f)
-    def like[R: AsResult](f: PartialFunction[A, R]) = new CheckedMatcher(f)
+    def apply(msg: B) = new CheckedMatcher(msg)
+    def which[R: AsResult](f: B => R) = new CheckedMatcher(f)
+    def like[R: AsResult](f: PartialFunction[B, R]) = new CheckedMatcher(f)
 
-    def allOf[R: AsResult](msgs: A*) = new AllOfMatcher(msgs)
+    def allOf[R: AsResult](msgs: B*) = new AllOfMatcher(msgs)
 
-    class CheckedMatcher(check: ValueCheck[A]) extends Matcher[TestKitBase] {
+    class CheckedMatcher(check: ValueCheck[B]) extends Matcher[TestKitBase] {
 
       def apply[S <: TestKitBase](t: Expectable[S]) = getMessage(t.value, timeout(t.value)) match {
         case None => result(false, "", receiveKoMsg(timeout(t.value)), t)
         case Some(msg) =>
-          val r = beAnInstanceOf[A].check(msg) and check.check(msg.asInstanceOf[A])
+          val r = beAnInstanceOf[A].check(msg) and check.check(unwrapFunc(msg.asInstanceOf[A]))
           result(r.isSuccess, s"${receiveOkMsg(msg)} and ${r.message}", s"${receiveOkMsg(msg)} but ${r.message}", t)
       }
 
       def afterOthers = new AfterOthersMatcher(check)
     }
 
-    class AfterOthersMatcher(check: ValueCheck[A]) extends Matcher[TestKitBase] {
+    class AfterOthersMatcher(check: ValueCheck[B]) extends Matcher[TestKitBase] {
 
       def apply[S <: TestKitBase](t: Expectable[S]) = {
         def now = System.nanoTime.nanos
@@ -71,7 +75,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
               result(false, "", koMessage, t)
 
             case Some(msg) =>
-              val r = msg must beAnInstanceOf[A] and check.check(msg.asInstanceOf[A])
+              val r = beAnInstanceOf[A].check(msg) and check.check(unwrapFunc(msg.asInstanceOf[A]))
               if (r.isSuccess) result(true, s"${receiveOkMsg(msg)} and ${r.message}", "", t) else recv
           }
         }
@@ -79,13 +83,13 @@ trait AkkaMatchers { this: SpecificationFeatures =>
       }
     }
 
-    class AllOfMatcher(msgs: Seq[A]) extends Matcher[TestKitBase] {
+    class AllOfMatcher(msgs: Seq[B]) extends Matcher[TestKitBase] {
 
       def apply[S <: TestKitBase](t: Expectable[S]) = {
         def now = System.nanoTime.nanos
         val stop = now + timeout(t.value)
 
-        def recv(missing: Seq[A]): MatchResult[S] = {
+        def recv(missing: Seq[B]): MatchResult[S] = {
           if (missing.isEmpty) result(true, "Received all messages", "", t)
           else {
             getMessage(t.value, stop - now) match {
@@ -94,7 +98,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
                 val koMessage = s"Timeout (${timeout(t.value)}) while waiting for messages $missingMsgs"
                 result(false, "", koMessage, t)
 
-              case Some(msg: A) if missing.contains(msg) => recv(missing.diff(msg :: Nil))
+              case Some(msg: A) if missing.contains(unwrapFunc(msg)) => recv(missing.diff(unwrapFunc(msg) :: Nil))
               case Some(msg) => result(false, "", s"Received unexpected message '$msg'", t)
             }
           }
