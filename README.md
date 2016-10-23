@@ -7,7 +7,7 @@ A small library for those who use [akka-testkit](http://doc.akka.io/docs/akka/cu
 To use akka-testkit-specs2 in an existing SBT project with Scala 2.11.x, add the following dependency to your `build.sbt`:
 
 ```scala
-libraryDependencies += "net.ruippeixotog" %% "akka-testkit-specs2" % "2.4.11-SNAPSHOT"
+libraryDependencies += "net.ruippeixotog" %% "akka-testkit-specs2" % "0.1.0"
 ```
 
 To use it in your specifications, just extend `AkkaSpecification`:

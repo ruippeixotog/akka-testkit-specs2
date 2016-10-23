@@ -2,7 +2,7 @@ import scalariform.formatter.preferences._
 
 name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
-version := "0.1.0-SNAPSHOT"
+version := "0.1.0"
 
 scalaVersion := "2.11.8"
 
