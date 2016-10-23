@@ -88,7 +88,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
     }
 
     "provide a matcher for receiving multiple unordered messages" in new ProbeTest {
-      val matchTest = receive.allOf("a", "a", "b")
+      val matchTest = receive[String].allOf("a", "a", "b")
 
       Seq("a", "a", "b").foreach { probe.ref ! _ }
       (probe must matchTest) must beSuccessful
@@ -98,8 +98,11 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for messages 'a', 'b'")
       Seq("a", "b").foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for messages 'a'")
+      Seq("b", "c").foreach { probe.ref ! _ }
+      (probe must matchTest) must beFailing("Received unexpected message 'c'")
       Seq("b", 6).foreach { probe.ref ! _ }
-      (probe must matchTest) must beFailing("Received unexpected message '6'")
+      (probe must matchTest) must beFailing(
+        "Received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'")
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -134,8 +137,8 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! Letter("hello")
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("ohlla")
-      (probe must receiveLetter.which(_ must startWith("h"))) must
-        beFailing("Received message 'Letter\\(ohlla\\)' but 'ohlla' doesn't start with 'h'")
+      (probe must receiveLetter.which(_ must startWith("h"))) must beFailing(
+        "Received message 'Letter\\(ohlla\\)' but 'ohlla' doesn't start with 'h'")
       // no message sent
       (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -147,11 +150,11 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! Letter("john", "hello")
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("john", "ohlla")
-      (probe must receiveLetter.which(_ must startWith("h"))) must
-        beFailing("Received message 'Letter\\(john,ohlla\\)' but 'ohlla' doesn't start with 'h'")
+      (probe must receiveLetter.which(_ must startWith("h"))) must beFailing(
+        "Received message 'Letter\\(john,ohlla\\)' but 'ohlla' doesn't start with 'h'")
       probe.ref ! Letter("mary", "hello")
-      (probe must receiveLetter) must
-        beFailing(s"Received message 'Letter\\(mary,hello\\)' but undefined function for 'Letter\\(mary,hello\\)'")
+      (probe must receiveLetter) must beFailing(
+        s"Received message 'Letter\\(mary,hello\\)' but undefined function for 'Letter\\(mary,hello\\)'")
       // no message sent
       (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
