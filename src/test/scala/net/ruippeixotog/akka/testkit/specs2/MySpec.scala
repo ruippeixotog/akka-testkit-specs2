@@ -39,6 +39,10 @@ class MySpec extends AkkaSpecification {
       testActor ! "hello" // expect a message with an explicit timeout
       this must receiveWithin(1.second)("hello")
 
+      case class Envelope(msg: String) // unwrap a message before matching
+      testActor ! Envelope("hello")
+      this must receive[Envelope].unwrap(_.msg).which(_ must startWith("h"))
+
       testActor ! "hello" // ...and several combinations of the modifiers above
       this must receiveWithin(1.second)[String].which(_ must startWith("h")).afterOthers
     }

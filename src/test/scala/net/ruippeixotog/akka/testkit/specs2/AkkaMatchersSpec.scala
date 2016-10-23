@@ -53,7 +53,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
     }
 
     "provide a matcher for receiving messages matching a function" in new ProbeTest {
-      val matchTest = receive[String].which { s => s must startWith("h") }
+      val matchTest = receive[String].which(_ must startWith("h"))
 
       probe.ref ! "hello"
       (probe must matchTest) must beSuccessful
@@ -106,7 +106,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
 
     "provide a matcher for receiving a message, discarding others meanwhile" in new ProbeTest {
       val matchTest = receive("hello").afterOthers
-      val matchTestWhich = receive[String].which { s => s must startWith("h") }.afterOthers
+      val matchTestWhich = receive[String].which(_ must startWith("h")).afterOthers
 
       probe.ref ! "hello"
       (probe must matchTest) must beSuccessful
@@ -127,15 +127,31 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must matchTestWhich) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
     }
 
-    "allow unwrapping data in envelope-like messages before matching" in new ProbeTest {
+    "allow unwrapping data in envelope-like messages using a function" in new ProbeTest {
       case class Letter(msg: String)
       val receiveLetter = receive[Letter].unwrap(_.msg)
 
       probe.ref ! Letter("hello")
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("ohlla")
-      (probe must receiveLetter.which { s => s must startWith("h") }) must
+      (probe must receiveLetter.which(_ must startWith("h"))) must
         beFailing("Received message 'Letter\\(ohlla\\)' but 'ohlla' doesn't start with 'h'")
+      // no message sent
+      (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
+    }
+
+    "allow unwrapping data in envelope-like messages using a partial function" in new ProbeTest {
+      case class Letter(to: String, msg: String)
+      val receiveLetter = receive[Letter].unwrapPf { case Letter("john", msg) => msg }
+
+      probe.ref ! Letter("john", "hello")
+      (probe must receiveLetter) must beSuccessful
+      probe.ref ! Letter("john", "ohlla")
+      (probe must receiveLetter.which(_ must startWith("h"))) must
+        beFailing("Received message 'Letter\\(john,ohlla\\)' but 'ohlla' doesn't start with 'h'")
+      probe.ref ! Letter("mary", "hello")
+      (probe must receiveLetter) must
+        beFailing(s"Received message 'Letter\\(mary,hello\\)' but undefined function for 'Letter\\(mary,hello\\)'")
       // no message sent
       (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -152,7 +168,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receiveWithin(3.second)("hello")) must beSuccessful
 
       schedule("hello", 4.seconds)
-      (probe must receiveWithin(5.seconds)[String].which { s => ok }) must beSuccessful
+      (probe must receiveWithin(5.seconds)[String].which(_ => ok)) must beSuccessful
 
       schedule("a", 2.seconds)
       schedule("b", 4.seconds)

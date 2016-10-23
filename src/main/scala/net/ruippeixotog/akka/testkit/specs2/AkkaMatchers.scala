@@ -41,6 +41,9 @@ trait AkkaMatchers { this: SpecificationFeatures =>
     def unwrap[B](f: A => B) =
       new ReceiveMatcher[B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
 
+    def unwrapPf[B](f: PartialFunction[A, B]) =
+      new ReceiveMatcher[B](getMessage.andThen(_.mapTransform(f.andThen(_ => ok), f)))
+
     def apply(msg: A) = new CheckedReceiveMatcher(getMessage, msg)
     def which[R: AsResult](f: A => R) = new CheckedReceiveMatcher(getMessage, f)
     def like[R: AsResult](f: PartialFunction[A, R]) = new CheckedReceiveMatcher(getMessage, f)
