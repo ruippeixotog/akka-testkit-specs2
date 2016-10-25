@@ -95,14 +95,17 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       Seq("b", "a", "a").foreach { probe.ref ! _ }
       (probe must matchTest) must beSuccessful
       probe.ref ! "a"
-      (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for messages 'a', 'b'")
+      (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for messages 'a, b'")
       Seq("a", "b").foreach { probe.ref ! _ }
-      (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for messages 'a'")
+      (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message 'a'")
+      probe.ref ! "c"
+      (probe must matchTest) must beFailing("Received message 'c' but 'c' is not contained in 'a, a, b'")
       Seq("b", "c").foreach { probe.ref ! _ }
-      (probe must matchTest) must beFailing("Received unexpected message 'c'")
+      (probe must matchTest) must beFailing(
+        "Received message 'b' and received message 'c' but 'c' is not contained in 'a, a'")
       Seq("b", 6).foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
-        "Received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'")
+        "Received message 'b' and received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'")
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -110,6 +113,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
     "provide a matcher for receiving a message, discarding others meanwhile" in new ProbeTest {
       val matchTest = receive("hello").afterOthers
       val matchTestWhich = receive[String].which(_ must startWith("h")).afterOthers
+      val matchTestAllOf = receive.allOf("a", "a", "b").afterOthers
 
       probe.ref ! "hello"
       (probe must matchTest) must beSuccessful
@@ -128,6 +132,15 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must matchTestWhich) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
       // no message sent
       (probe must matchTestWhich) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
+
+      Seq("a", "a", "b").foreach { probe.ref ! _ }
+      (probe must matchTestAllOf) must beSuccessful
+      Seq("a", "ohlla", 6, "a", "b").foreach { probe.ref ! _ }
+      (probe must matchTestAllOf) must beSuccessful
+      Seq("a", "b").foreach { probe.ref ! _ }
+      (probe must matchTestAllOf) must beFailing(s"Timeout \\($timeout\\) while waiting for message 'a'")
+      // no message sent
+      (probe must matchTestAllOf) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
 
     "allow unwrapping data in envelope-like messages using a function" in new ProbeTest {
@@ -176,7 +189,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       schedule("a", 2.seconds)
       schedule("b", 4.seconds)
       (probe must receiveWithin(3.seconds).allOf("a", "b")) must
-        beFailing(s"Timeout \\($timeout\\) while waiting for messages 'b'")
+        beFailing(s"Timeout \\($timeout\\) while waiting for message 'b'")
 
       (probe must receiveWithin(2.seconds)("b")) must beSuccessful
 

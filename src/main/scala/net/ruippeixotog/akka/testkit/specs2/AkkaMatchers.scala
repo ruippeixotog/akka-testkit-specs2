@@ -30,12 +30,12 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   def receiveMessageWithin(max: FiniteDuration) = receiveWithin(max)
 
   abstract class BaseReceiveMatcher[A](implicit tf: TimeoutFunc) extends Matcher[TestKitBase] {
-    protected def getMessage: GetMessageFunc[A]
+    def getMessage: GetMessageFunc[A]
 
     def apply[S <: TestKitBase](t: Expectable[S]) = result(getMessage(t.value, tf(t.value)).result, t)
   }
 
-  class ReceiveMatcher[A](protected val getMessage: GetMessageFunc[A])(implicit tf: TimeoutFunc)
+  class ReceiveMatcher[A](val getMessage: GetMessageFunc[A])(implicit tf: TimeoutFunc)
       extends BaseReceiveMatcher[A] {
 
     def unwrap[B](f: A => B) =
@@ -50,11 +50,11 @@ trait AkkaMatchers { this: SpecificationFeatures =>
     def allOf[R: AsResult](msgs: A*) = new AllOfReceiveMatcher(getMessage, msgs)
   }
 
-  class UntypedReceiveMatcher(getMessage: GetMessageFunc[AnyRef])(implicit tf: TimeoutFunc)
-      extends ReceiveMatcher[Any](getMessage) {
+  class UntypedReceiveMatcher(_getMessage: GetMessageFunc[AnyRef])(implicit tf: TimeoutFunc)
+      extends ReceiveMatcher[Any](_getMessage) {
 
     def apply[A: ClassTag] =
-      new ReceiveMatcher[A](getMessage.andThen(_.mapTransform[A](beAnInstanceOf[A], _.asInstanceOf[A])))
+      new ReceiveMatcher[A](_getMessage.andThen(_.mapTransform[A](beAnInstanceOf[A], _.asInstanceOf[A])))
   }
 
   object UntypedReceiveMatcher {
@@ -72,52 +72,77 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   class CheckedReceiveMatcher[A](_getMessage: GetMessageFunc[A], check: ValueCheck[A])(implicit tf: TimeoutFunc)
       extends BaseReceiveMatcher[A] {
 
-    protected val getMessage = _getMessage.andThen(_.mapCheck(check))
+    val getMessage = _getMessage.andThen(_.mapCheck(check))
 
     def afterOthers = new AfterOthersReceiveMatcher(getMessage)
   }
 
-  class AfterOthersReceiveMatcher[A](getMessage: GetMessageFunc[A])(implicit tf: TimeoutFunc)
-      extends Matcher[TestKitBase] {
+  class AfterOthersReceiveMatcher[A](_getMessage: GetMessageFunc[A])(implicit tf: TimeoutFunc)
+      extends BaseReceiveMatcher[A] {
 
-    def apply[S <: TestKitBase](t: Expectable[S]) = {
+    val getMessage = { (probe: TestKitBase, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
-      val stop = now + tf(t.value)
+      val stop = now + timeout
 
-      def recv: MatchResult[S] = {
-        getMessage(t.value, stop - now) match {
-          case SuccessValue(res, _) => result(res, t)
+      def recv: ResultValue[A] = {
+        _getMessage(probe, stop - now) match {
+          case r @ SuccessValue(_, _) => r
           case FailureValue(_, CheckFailed) => recv
           case FailureValue(_, ReceiveTimeout) =>
-            result(false, "", s"Timeout (${tf(t.value)}) while waiting for matching message", t)
+            val koMessage = s"Timeout ($timeout) while waiting for matching message"
+            FailureValue.timeout(koMessage)
         }
       }
       recv
     }
   }
 
-  class AllOfReceiveMatcher[A](getMessage: GetMessageFunc[A], msgs: Seq[A])(implicit tf: TimeoutFunc)
-      extends Matcher[TestKitBase] {
+  class BaseAllOfReceiveMatcher[A](_getMessage: GetMessageFunc[A], msgs: Seq[A])(implicit tf: TimeoutFunc)
+      extends BaseReceiveMatcher[Seq[A]] {
 
-    def apply[S <: TestKitBase](t: Expectable[S]) = {
+    protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[A] =
+      _getMessage.andThen(_.mapCheck(beOneOf(remMsgs: _*)))
+
+    val getMessage = { (probe: TestKitBase, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
-      val stop = now + tf(t.value)
+      val stop = now + timeout
 
-      def recv(missing: Seq[A]): MatchResult[S] = {
-        if (missing.isEmpty) result(true, "Received all messages", "", t)
+      def recv(missing: Seq[A], received: Seq[A]): ResultValue[Seq[A]] = {
+        if (missing.isEmpty) SuccessValue(Success("Received all messages"), msgs)
         else {
-          getMessage(t.value, stop - now) match {
-            case SuccessValue(_, msg) if missing.contains(msg) => recv(missing.diff(msg :: Nil))
-            case SuccessValue(_, msg) => result(false, "", s"Received unexpected message '$msg'", t)
-            case FailureValue(res, CheckFailed) => result(res, t)
+          getRemainingMessages(missing)(probe, stop - now) match {
+            case SuccessValue(_, msg) => recv(missing.diff(msg :: Nil), received :+ msg)
+
+            case r @ FailureValue(res, CheckFailed) =>
+              received match {
+                case Nil => r
+                case recvMsg +: Nil => FailureValue.failedCheck(
+                  s"Received message '$recvMsg' and ${res.message.uncapitalize}")
+                case recvMsgs => FailureValue.failedCheck(
+                  s"Received messages '${recvMsgs.mkString(", ")}' and ${res.message.uncapitalize}")
+              }
+
             case FailureValue(_, ReceiveTimeout) =>
-              val missingMsgs = missing.map { msg => s"'$msg'" }.mkString(", ")
-              val koMessage = s"Timeout (${tf(t.value)}) while waiting for messages $missingMsgs"
-              result(false, "", koMessage, t)
+              val missingMsgs = missing.mkString(", ")
+              val messageWord = if (missingMsgs.length > 1) "messages" else "message"
+              FailureValue.timeout(s"Timeout ($timeout) while waiting for $messageWord '$missingMsgs'")
           }
         }
       }
-      recv(msgs)
+      recv(msgs, Vector.empty)
     }
+  }
+
+  class AllOfReceiveMatcher[A](_getMessage: GetMessageFunc[A], msgs: Seq[A])(implicit tf: TimeoutFunc)
+      extends BaseAllOfReceiveMatcher[A](_getMessage, msgs) {
+
+    def afterOthers = new AllOfAfterOthersReceiveMatcher(_getMessage, msgs)
+  }
+
+  class AllOfAfterOthersReceiveMatcher[A](_getMessage: GetMessageFunc[A], msgs: Seq[A])(implicit tf: TimeoutFunc)
+      extends BaseAllOfReceiveMatcher[A](_getMessage, msgs) {
+
+    override protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[A] =
+      new AfterOthersReceiveMatcher(super.getRemainingMessages(remMsgs)).getMessage
   }
 }
