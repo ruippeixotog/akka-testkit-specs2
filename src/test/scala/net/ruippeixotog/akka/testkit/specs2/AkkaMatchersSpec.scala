@@ -88,21 +88,24 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
     }
 
     "provide a matcher for receiving multiple unordered messages" in new ProbeTest {
-      val matchTest = receive[String].allOf("a", "a", "b")
+      val matchTest = receive[String].allOf("a", "a", "b", "c")
 
-      Seq("a", "a", "b").foreach { probe.ref ! _ }
+      Seq("a", "a", "b", "c").foreach { probe.ref ! _ }
       (probe must matchTest) must beSuccessful
-      Seq("b", "a", "a").foreach { probe.ref ! _ }
+      Seq("b", "a", "c", "a").foreach { probe.ref ! _ }
       (probe must matchTest) must beSuccessful
       probe.ref ! "a"
-      (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for messages 'a, b'")
-      Seq("a", "b").foreach { probe.ref ! _ }
+      (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for messages 'a, b, c'")
+      Seq("a", "b", "c").foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message 'a'")
-      probe.ref ! "c"
-      (probe must matchTest) must beFailing("Received message 'c' but 'c' is not contained in 'a, a, b'")
-      Seq("b", "c").foreach { probe.ref ! _ }
+      probe.ref ! "d"
+      (probe must matchTest) must beFailing("Received message 'd' but 'd' is not contained in 'a, a, b, c'")
+      Seq("b", "d").foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
-        "Received message 'b' and received message 'c' but 'c' is not contained in 'a, a'")
+        "Received message 'b' and received message 'd' but 'd' is not contained in 'a, a, c'")
+      Seq("a", "b", "d").foreach { probe.ref ! _ }
+      (probe must matchTest) must beFailing(
+        "Received messages 'a, b' and received message 'd' but 'd' is not contained in 'a, c'")
       Seq("b", 6).foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
         "Received message 'b' and received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'")
