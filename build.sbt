@@ -2,7 +2,7 @@ import scalariform.formatter.preferences._
 
 name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
-version := "0.1.1-SNAPSHOT"
+version := "0.2.0-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 
@@ -11,15 +11,15 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.specs2"            %% "specs2-core"        % "3.8.5.1",
-  "com.typesafe.akka"     %% "akka-testkit"       % "2.4.11")
+  "com.typesafe.akka"     %% "akka-testkit"       % "2.4.12")
 
 scalariformPreferences := scalariformPreferences.value
   .setPreference(DanglingCloseParenthesis, Prevent)
   .setPreference(DoubleIndentClassDeclaration, true)
 
-publishTo <<= version { v =>
+publishTo := {
   val nexus = "https://oss.sonatype.org/"
-  if (v.trim.endsWith("SNAPSHOT"))
+  if (isSnapshot.value)
     Some("snapshots" at nexus + "content/repositories/snapshots")
   else
     Some("releases"  at nexus + "service/local/staging/deploy/maven2")
