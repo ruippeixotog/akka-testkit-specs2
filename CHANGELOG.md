@@ -1,4 +1,4 @@
-### 0.2.0 (unreleased)
+### 0.2.0 (Nov 3, 2016)
 
 - New features
   - Support for `receive.allOf(...).afterOthers`;
