@@ -1,3 +1,7 @@
+### 0.2.1 (Feb 1, 2016)
+
+Updated dependency versions only.
+
 ### 0.2.0 (Nov 3, 2016)
 
 - New features

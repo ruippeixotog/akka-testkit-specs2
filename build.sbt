@@ -2,17 +2,17 @@ import scalariform.formatter.preferences._
 
 name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
-version := "0.2.1-SNAPSHOT"
+version := "0.2.1"
 
-scalaVersion := "2.12.0"
-crossScalaVersions := Seq("2.11.8", "2.12.0")
+scalaVersion := "2.12.1"
+crossScalaVersions := Seq("2.11.8", "2.12.1")
 
 resolvers ++= Seq(
-  "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases")
+  Resolver.bintrayRepo("scalaz", "releases"))
 
 libraryDependencies ++= Seq(
-  "org.specs2"            %% "specs2-core"        % "3.8.6",
-  "com.typesafe.akka"     %% "akka-testkit"       % "2.4.12")
+  "org.specs2"            %% "specs2-core"        % "3.8.7",
+  "com.typesafe.akka"     %% "akka-testkit"       % "2.4.16")
 
 scalariformPreferences := scalariformPreferences.value
   .setPreference(DanglingCloseParenthesis, Prevent)
