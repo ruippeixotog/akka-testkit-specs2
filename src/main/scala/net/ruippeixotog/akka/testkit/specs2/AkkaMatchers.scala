@@ -47,7 +47,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
     def apply(msg: A) = new CheckedReceiveMatcher(getMessage, msg)
     def which[R: AsResult](f: A => R) = new CheckedReceiveMatcher(getMessage, f)
     def like[R: AsResult](f: PartialFunction[A, R]) = new CheckedReceiveMatcher(getMessage, f)
-    def allOf[R: AsResult](msgs: A*) = new AllOfReceiveMatcher(getMessage, msgs)
+    def allOf(msgs: A*) = new AllOfReceiveMatcher(getMessage, msgs)
     def afterOthers = new AfterOthersReceiveMatcher(getMessage)
   }
 
