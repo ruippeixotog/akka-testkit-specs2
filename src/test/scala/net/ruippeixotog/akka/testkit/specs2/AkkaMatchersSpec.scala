@@ -115,6 +115,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
 
     "provide a matcher for receiving a message, discarding others meanwhile" in new ProbeTest {
       val matchTest = receive("hello").afterOthers
+      val matchTestAfterOthers = receive[String].afterOthers
       val matchTestWhich = receive[String].which(_ must startWith("h")).afterOthers
       val matchTestAllOf = receive.allOf("a", "a", "b").afterOthers
 
@@ -126,6 +127,15 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
+
+      probe.ref ! "hello"
+      (probe must matchTestAfterOthers) must beSuccessful
+      Seq(1, 6, "hello").foreach { probe.ref ! _ }
+      (probe must matchTestAfterOthers) must beSuccessful
+      Seq(1, 2).foreach { probe.ref ! _ }
+      (probe must matchTestAfterOthers) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
+      // no message sent
+      (probe must matchTestAfterOthers) must beFailing(s"Timeout \\($timeout\\) while waiting for matching message")
 
       probe.ref ! "hello"
       (probe must matchTestWhich) must beSuccessful
