@@ -1,8 +1,8 @@
-### 0.2.2 (unreleased)
+### 0.2.2 (Oct 12, 2017)
 
 Updated dependency versions (specs2 3.9.5 + akka 2.5.6).
 
-### 0.2.1 (Feb 1, 2016)
+### 0.2.1 (Feb 1, 2017)
 
 Updated dependency versions (specs2 3.8.7 + akka 2.4.16).
 
