@@ -10,7 +10,7 @@ import org.specs2.concurrent.ExecutionEnv
 import org.specs2.specification.{ AfterAll, Scope }
 
 class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()) with SpecificationLike
-    with AkkaMatchers with ResultMatchers with AfterAll {
+  with AkkaMatchers with ResultMatchers with AfterAll {
 
   val timeout = remainingOrDefault
 

@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
 
 scalariformPreferences := scalariformPreferences.value
   .setPreference(DanglingCloseParenthesis, Prevent)
-  .setPreference(DoubleIndentClassDeclaration, true)
+  .setPreference(DoubleIndentConstructorArguments, true)
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
@@ -32,7 +32,7 @@ pomIncludeRepository := { _ => false }
 
 licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 homepage := Some(url("https://github.com/ruippeixotog/akka-testkit-specs2"))
-pomExtra :=
+pomExtra := {
   <scm>
     <url>https://github.com/ruippeixotog/akka-testkit-specs2</url>
     <connection>scm:git:https://github.com/ruippeixotog/akka-testkit-specs2.git</connection>
@@ -44,3 +44,5 @@ pomExtra :=
       <url>http://www.ruippeixotog.net</url>
     </developer>
   </developers>
+}
+
