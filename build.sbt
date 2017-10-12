@@ -1,8 +1,8 @@
+import ReleaseTransformations._
 import scalariform.formatter.preferences._
 
 name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
-version := "0.2.2-SNAPSHOT"
 
 scalaVersion := "2.12.3"
 crossScalaVersions := Seq("2.11.11", "2.12.3")
@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
 
 scalariformPreferences := scalariformPreferences.value
   .setPreference(DanglingCloseParenthesis, Prevent)
-  .setPreference(DoubleIndentClassDeclaration, true)
+  .setPreference(DoubleIndentConstructorArguments, true)
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
@@ -32,7 +32,7 @@ pomIncludeRepository := { _ => false }
 
 licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 homepage := Some(url("https://github.com/ruippeixotog/akka-testkit-specs2"))
-pomExtra :=
+pomExtra := {
   <scm>
     <url>https://github.com/ruippeixotog/akka-testkit-specs2</url>
     <connection>scm:git:https://github.com/ruippeixotog/akka-testkit-specs2.git</connection>
@@ -44,3 +44,22 @@ pomExtra :=
       <url>http://www.ruippeixotog.net</url>
     </developer>
   </developers>
+}
+
+releaseCrossBuild := true
+releaseTagComment := s"Release ${(version in ThisBuild).value}"
+releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  releaseStepCommand("publishSigned"),
+  setNextVersion,
+  commitNextVersion,
+  releaseStepCommand("sonatypeReleaseAll"),
+  pushChanges)

@@ -36,7 +36,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   }
 
   class ReceiveMatcher[A](val getMessage: GetMessageFunc[A])(implicit tf: TimeoutFunc)
-      extends BaseReceiveMatcher[A] {
+    extends BaseReceiveMatcher[A] {
 
     def unwrap[B](f: A => B) =
       new ReceiveMatcher[B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
@@ -52,7 +52,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   }
 
   class UntypedReceiveMatcher(_getMessage: GetMessageFunc[AnyRef])(implicit tf: TimeoutFunc)
-      extends ReceiveMatcher[Any](_getMessage) {
+    extends ReceiveMatcher[Any](_getMessage) {
 
     def apply[A: ClassTag] =
       new ReceiveMatcher[A](_getMessage.andThen(_.mapTransform[A](beAnInstanceOf[A], _.asInstanceOf[A])))
@@ -71,7 +71,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   }
 
   class CheckedReceiveMatcher[A](_getMessage: GetMessageFunc[A], check: ValueCheck[A])(implicit tf: TimeoutFunc)
-      extends BaseReceiveMatcher[A] {
+    extends BaseReceiveMatcher[A] {
 
     val getMessage = _getMessage.andThen(_.mapCheck(check))
 
@@ -79,7 +79,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   }
 
   class AfterOthersReceiveMatcher[A](_getMessage: GetMessageFunc[A])(implicit tf: TimeoutFunc)
-      extends BaseReceiveMatcher[A] {
+    extends BaseReceiveMatcher[A] {
 
     val getMessage = { (probe: TestKitBase, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
@@ -99,7 +99,7 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   }
 
   class BaseAllOfReceiveMatcher[A](_getMessage: GetMessageFunc[A], msgs: Seq[A])(implicit tf: TimeoutFunc)
-      extends BaseReceiveMatcher[Seq[A]] {
+    extends BaseReceiveMatcher[Seq[A]] {
 
     protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[A] =
       _getMessage.andThen(_.mapCheck(beOneOf(remMsgs: _*)))
@@ -135,13 +135,13 @@ trait AkkaMatchers { this: SpecificationFeatures =>
   }
 
   class AllOfReceiveMatcher[A](_getMessage: GetMessageFunc[A], msgs: Seq[A])(implicit tf: TimeoutFunc)
-      extends BaseAllOfReceiveMatcher[A](_getMessage, msgs) {
+    extends BaseAllOfReceiveMatcher[A](_getMessage, msgs) {
 
     def afterOthers = new AllOfAfterOthersReceiveMatcher(_getMessage, msgs)
   }
 
   class AllOfAfterOthersReceiveMatcher[A](_getMessage: GetMessageFunc[A], msgs: Seq[A])(implicit tf: TimeoutFunc)
-      extends BaseAllOfReceiveMatcher[A](_getMessage, msgs) {
+    extends BaseAllOfReceiveMatcher[A](_getMessage, msgs) {
 
     override protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[A] =
       new AfterOthersReceiveMatcher(super.getRemainingMessages(remMsgs)).getMessage
