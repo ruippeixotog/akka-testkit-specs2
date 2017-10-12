@@ -36,7 +36,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! "hello"
       (probe must receive("hello")) must beSuccessful
       probe.ref ! "holla"
-      (probe must receive("hello")) must beFailing("Received message 'holla' but 'holla' is not equal to 'hello'")
+      (probe must receive("hello")) must beFailing("Received message 'holla' but 'holla' != 'hello'")
       // no message sent
       (probe must receive("hello")) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -58,7 +58,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! "hello"
       (probe must matchTest) must beSuccessful
       probe.ref ! "ohlla"
-      (probe must matchTest) must beFailing("Received message 'ohlla' but 'ohlla' doesn't start with 'h'")
+      (probe must matchTest) must beFailing("Received message 'ohlla' but ohlla doesn't start with 'h'")
       probe.ref ! 6
       (probe must matchTest) must beFailing(
         "Received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'")
@@ -75,7 +75,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! Some("hello")
       (probe must matchTest) must beSuccessful
       probe.ref ! Some("ohlla")
-      (probe must matchTest) must beFailing("Received message 'Some\\(ohlla\\)' but 'ohlla' doesn't start with 'h'")
+      (probe must matchTest) must beFailing("Received message 'Some\\(ohlla\\)' but ohlla doesn't start with 'h'")
       probe.ref ! None
       (probe must matchTest) must beSuccessful
       probe.ref ! Some("")
@@ -164,7 +164,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("ohlla")
       (probe must receiveLetter.which(_ must startWith("h"))) must beFailing(
-        "Received message 'Letter\\(ohlla\\)' but 'ohlla' doesn't start with 'h'")
+        "Received message 'Letter\\(ohlla\\)' but ohlla doesn't start with 'h'")
       // no message sent
       (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -177,7 +177,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("john", "ohlla")
       (probe must receiveLetter.which(_ must startWith("h"))) must beFailing(
-        "Received message 'Letter\\(john,ohlla\\)' but 'ohlla' doesn't start with 'h'")
+        "Received message 'Letter\\(john,ohlla\\)' but ohlla doesn't start with 'h'")
       probe.ref ! Letter("mary", "hello")
       (probe must receiveLetter) must beFailing(
         s"Received message 'Letter\\(mary,hello\\)' but undefined function for 'Letter\\(mary,hello\\)'")
@@ -229,9 +229,9 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       }
 
       probe.ref ! "a"
-      (probe must matchTest) must beFailing("Received message 'a' but 'a' is not equal to 'str'")
+      (probe must matchTest) must beFailing("Received message 'a' but 'a' != 'str'")
       probe.ref ! 41
-      (probe must matchTest) must beFailing("Received message '41' but '41' is not equal to '42'")
+      (probe must matchTest) must beFailing("Received message '41' but 41 != 42")
       probe.ref ! None
       (probe must matchTest) must beFailing("Received message 'None' but undefined function for 'None'")
     }
