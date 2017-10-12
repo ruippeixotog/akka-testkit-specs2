@@ -4,15 +4,15 @@ name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
 version := "0.2.2-SNAPSHOT"
 
-scalaVersion := "2.12.1"
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+scalaVersion := "2.12.3"
+crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 resolvers ++= Seq(
   Resolver.bintrayRepo("scalaz", "releases"))
 
 libraryDependencies ++= Seq(
-  "org.specs2"            %% "specs2-core"        % "3.8.7",
-  "com.typesafe.akka"     %% "akka-testkit"       % "2.4.16")
+  "org.specs2"            %% "specs2-core"        % "3.9.5",
+  "com.typesafe.akka"     %% "akka-testkit"       % "2.5.6")
 
 scalariformPreferences := scalariformPreferences.value
   .setPreference(DanglingCloseParenthesis, Prevent)
