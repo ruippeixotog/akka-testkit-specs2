@@ -1,8 +1,8 @@
+import ReleaseTransformations._
 import scalariform.formatter.preferences._
 
 name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
-version := "0.2.2-SNAPSHOT"
 
 scalaVersion := "2.12.3"
 crossScalaVersions := Seq("2.11.11", "2.12.3")
@@ -46,3 +46,20 @@ pomExtra := {
   </developers>
 }
 
+releaseCrossBuild := true
+releaseTagComment := s"Release ${(version in ThisBuild).value}"
+releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  releaseStepCommand("publishSigned"),
+  setNextVersion,
+  commitNextVersion,
+  releaseStepCommand("sonatypeReleaseAll"),
+  pushChanges)
