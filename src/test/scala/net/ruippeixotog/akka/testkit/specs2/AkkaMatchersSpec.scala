@@ -79,7 +79,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! None
       (probe must matchTest) must beSuccessful
       probe.ref ! Some("")
-      (probe must matchTest) must beFailing("Received message 'Some\\(\\)' but undefined function for 'Some\\(\\)'")
+      (probe must matchTest) must beFailing("Received message 'Some\\(\\)' but undefined function for (Some\\(\\)|'Some\\(\\)')")
       probe.ref ! 6
       (probe must matchTest) must beFailing(
         "Received message '6' but '6: java.lang.Integer' is not an instance of 'scala.Option'")
@@ -233,7 +233,7 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! 41
       (probe must matchTest) must beFailing("Received message '41' but 41 != 42")
       probe.ref ! None
-      (probe must matchTest) must beFailing("Received message 'None' but undefined function for 'None'")
+      (probe must matchTest) must beFailing("Received message 'None' but undefined function for (None|'None')")
     }
   }
 

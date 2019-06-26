@@ -4,15 +4,15 @@ import scalariform.formatter.preferences._
 name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
 
-scalaVersion := "2.12.4"
-crossScalaVersions := Seq("2.11.11", "2.12.4")
+scalaVersion := "2.13.0"
+crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0")
 
 resolvers ++= Seq(
   Resolver.bintrayRepo("scalaz", "releases"))
 
 libraryDependencies ++= Seq(
-  "org.specs2"            %% "specs2-core"        % "4.0.1",
-  "com.typesafe.akka"     %% "akka-testkit"       % "2.5.6")
+  "org.specs2"            %% "specs2-core"        % "4.5.1",
+  "com.typesafe.akka"     %% "akka-testkit"       % "2.5.23")
 
 scalariformPreferences := scalariformPreferences.value
   .setPreference(DanglingCloseParenthesis, Prevent)
