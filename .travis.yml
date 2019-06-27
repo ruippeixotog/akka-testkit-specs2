@@ -8,9 +8,15 @@ scala:
 jdk:
   - oraclejdk8
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean coverage test
+  - if [[ $TRAVIS_SCALA_VERSION =~ ^2\.13.* ]]; then
+      sbt ++$TRAVIS_SCALA_VERSION clean test;
+      else
+      sbt ++$TRAVIS_SCALA_VERSION clean coverage test;
+      fi
 after_success:
-  - sbt ++$TRAVIS_SCALA_VERSION coverageReport coveralls
+  - if ! [[ $TRAVIS_SCALA_VERSION =~ ^2\.13.* ]]; then
+      sbt ++$TRAVIS_SCALA_VERSION coverageReport coveralls;
+      fi
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
       sbt ++$TRAVIS_SCALA_VERSION publish;
       fi
