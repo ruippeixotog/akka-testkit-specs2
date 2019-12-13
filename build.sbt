@@ -12,7 +12,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= Seq(
   "org.specs2"            %% "specs2-core"        % "4.5.1",
-  "com.typesafe.akka"     %% "akka-testkit"       % "2.5.23")
+  "com.typesafe.akka"     %% "akka-testkit"       % "2.6.1")
 
 scalariformPreferences := scalariformPreferences.value
   .setPreference(DanglingCloseParenthesis, Prevent)
