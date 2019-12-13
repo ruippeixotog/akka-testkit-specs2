@@ -4,8 +4,8 @@ import scalariform.formatter.preferences._
 name := "akka-testkit-specs2"
 organization := "net.ruippeixotog"
 
-scalaVersion := "2.13.0"
-crossScalaVersions := Seq("2.11.12", "2.12.8", "2.13.0")
+scalaVersion := "2.13.1"
+crossScalaVersions := Seq("2.12.10", "2.13.1")
 
 resolvers ++= Seq(
   Resolver.bintrayRepo("scalaz", "releases"))
