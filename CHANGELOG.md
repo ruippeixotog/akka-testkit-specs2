@@ -1,6 +1,6 @@
-### 0.2.4 (?)
+### 0.2.4 (Dec 14, 2019)
 
-Updated dependency versions (specs2 4.5.1 + akka 2.5.23) and added support for Scala 2.13.
+Updated dependency versions (specs2 4.8.1 + akka 2.6.1) and added support for Scala 2.13.
 
 ### 0.2.3 (Nov 2, 2017)
 
