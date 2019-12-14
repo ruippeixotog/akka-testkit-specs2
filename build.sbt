@@ -7,11 +7,8 @@ organization := "net.ruippeixotog"
 scalaVersion := "2.13.1"
 crossScalaVersions := Seq("2.12.10", "2.13.1")
 
-resolvers ++= Seq(
-  Resolver.bintrayRepo("scalaz", "releases"))
-
 libraryDependencies ++= Seq(
-  "org.specs2"            %% "specs2-core"        % "4.5.1",
+  "org.specs2"            %% "specs2-core"        % "4.8.1",
   "com.typesafe.akka"     %% "akka-testkit"       % "2.6.1")
 
 scalariformPreferences := scalariformPreferences.value
@@ -32,19 +29,11 @@ pomIncludeRepository := { _ => false }
 
 licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 homepage := Some(url("https://github.com/ruippeixotog/akka-testkit-specs2"))
-pomExtra := {
-  <scm>
-    <url>https://github.com/ruippeixotog/akka-testkit-specs2</url>
-    <connection>scm:git:https://github.com/ruippeixotog/akka-testkit-specs2.git</connection>
-  </scm>
-  <developers>
-    <developer>
-      <id>ruippeixotog</id>
-      <name>Rui Gonçalves</name>
-      <url>http://www.ruippeixotog.net</url>
-    </developer>
-  </developers>
-}
+scmInfo := Some(ScmInfo(
+  url("https://github.com/ruippeixotog/akka-testkit-specs2"),
+  "scm:git:https://github.com/ruippeixotog/akka-testkit-specs2.git"))
+developers := List(
+  Developer("ruippeixotog", "Rui Gonçalves", "ruippeixotog@gmail.com", url("https://github.com/ruippeixotog")))
 
 releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
