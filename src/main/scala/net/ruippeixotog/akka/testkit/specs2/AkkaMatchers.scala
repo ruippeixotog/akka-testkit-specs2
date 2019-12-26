@@ -4,13 +4,12 @@ import scala.concurrent.duration.FiniteDuration
 
 import akka.testkit.TestKitBase
 import org.specs2.execute.{ Failure, Success }
-import org.specs2.specification.SpecificationFeatures
 
 import net.ruippeixotog.akka.testkit.specs2.ResultValue.ReceiveTimeout
 import net.ruippeixotog.akka.testkit.specs2.api.UntypedReceiveMatcher
 import net.ruippeixotog.akka.testkit.specs2.impl.Matchers._
 
-trait AkkaMatchers { this: SpecificationFeatures =>
+trait AkkaMatchers {
 
   def receive: UntypedReceiveMatcher[TestKitBase] = {
     akkaClassicReceiveMatcher(

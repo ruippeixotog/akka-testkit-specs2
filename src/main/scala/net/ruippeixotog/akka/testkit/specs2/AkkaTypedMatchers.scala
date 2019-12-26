@@ -5,13 +5,12 @@ import scala.util.Try
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import org.specs2.execute.{ Failure, Success }
-import org.specs2.specification.SpecificationFeatures
 
 import net.ruippeixotog.akka.testkit.specs2.ResultValue.ReceiveTimeout
 import net.ruippeixotog.akka.testkit.specs2.api.ReceiveMatcher
 import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.ReceiveMatcherImpl
 
-trait AkkaTypedMatchers { this: SpecificationFeatures =>
+trait AkkaTypedMatchers {
 
   def receive[Msg]: ReceiveMatcher[TestProbe[Msg], Msg] = {
     akkaTypedReceiveMatcher[Msg](
