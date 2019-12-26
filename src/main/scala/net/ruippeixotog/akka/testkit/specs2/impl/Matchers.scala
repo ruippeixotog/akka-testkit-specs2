@@ -36,7 +36,9 @@ private[specs2] object Matchers {
       new ReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(f.andThen(_ => ok), f)))
 
     def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): ReceiveMatcher[P, B] = {
-      val beAnInstanceOfB: Matcher[A] = ev.substituteContra(beAnInstanceOf[B])
+      // Always true because of `ev` and because `Matcher` is contravariant.
+      // In Scala 2.13 we can avoid this with `ev.substituteContra(beAnInstanceOf[B])`.
+      val beAnInstanceOfB = beAnInstanceOf[B].asInstanceOf[Matcher[A]]
       new ReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform[B](beAnInstanceOfB, _.asInstanceOf[B])))
     }
 
