@@ -1,7 +1,6 @@
 package net.ruippeixotog.akka.testkit.specs2
 
 import scala.concurrent.duration.FiniteDuration
-import scala.util.Try
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 import org.specs2.execute.{ Failure, Success }
@@ -35,10 +34,11 @@ trait AkkaTypedMatchers {
     timeoutFunc: TestProbe[Msg] => FiniteDuration): ReceiveMatcher[TestProbe[Msg], Msg] = {
 
     val getMessage = { (probe: TestProbe[Msg], timeout: FiniteDuration) =>
-      Try(probe.receiveMessage(timeout)) match {
-        case util.Success(msg) => SuccessValue(Success(receiveOkMsg(msg)), msg)
-        case util.Failure(_: AssertionError) => FailureValue(Failure(receiveKoMsg(timeout)), ReceiveTimeout)
-        case util.Failure(ex) => throw ex
+      try {
+        val msg = probe.receiveMessage(timeout)
+        SuccessValue(Success(receiveOkMsg(msg)), msg)
+      } catch {
+        case _: AssertionError => FailureValue(Failure(receiveKoMsg(timeout)), ReceiveTimeout)
       }
     }
     new ReceiveMatcherImpl[TestProbe[Msg], Msg](getMessage)(timeoutFunc)
