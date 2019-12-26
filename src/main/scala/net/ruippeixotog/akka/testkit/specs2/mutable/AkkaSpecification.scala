@@ -7,7 +7,7 @@ import akka.testkit.TestKit
 
 import AkkaSpecification._
 
-class AkkaSpecification(_system: ActorSystem = actorSystemForClass(getClass))
+abstract class AkkaSpecification(_system: ActorSystem = actorSystemForClass(getClass))
   extends TestKit(_system) with AkkaSpecificationLike
 
 object AkkaSpecification {

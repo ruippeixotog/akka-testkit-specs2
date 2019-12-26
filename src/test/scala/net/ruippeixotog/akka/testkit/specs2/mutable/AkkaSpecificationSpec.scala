@@ -14,7 +14,7 @@ class AkkaSpecificationSpec(implicit env: ExecutionEnv) extends AkkaSpecificatio
 
     "terminate the actor system when the spec finishes" in {
       val testSystem = ActorSystem("ShutdownTest")
-      specs2.run(new AkkaSpecification(testSystem))
+      specs2.run(new AkkaSpecification(testSystem) {})
       testSystem.whenTerminated.isCompleted must beTrue
     }
   }
