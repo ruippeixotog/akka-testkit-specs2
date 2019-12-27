@@ -78,4 +78,4 @@ class MySpec extends AkkaSpecification {
 
 ## Copyright
 
-Copyright (c) 2016-2017 Rui Gonçalves. See LICENSE for details.
+Copyright (c) 2016-2019 Rui Gonçalves. See LICENSE for details.
