@@ -19,27 +19,27 @@ private[specs2] object Matchers {
   type TimeoutFunc[P] = P => FiniteDuration
   type GetMessageFunc[P, +A] = (P, FiniteDuration) => ResultValue[A]
 
-  abstract class BaseReceiveMatcherImpl[P, A](implicit tf: TimeoutFunc[P]) extends BaseReceiveMatcher[P, A] {
+  abstract class ReceiveMatcherImpl[P, A](implicit tf: TimeoutFunc[P]) extends ReceiveMatcher[P, A] {
     def getMessage: GetMessageFunc[P, A]
 
     def apply[S <: P](t: Expectable[S]): MatchResult[S] =
       result(getMessage(t.value, tf(t.value)).result, t)
   }
 
-  class ReceiveMatcherImpl[P, A](val getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
-    extends BaseReceiveMatcherImpl[P, A] with ReceiveMatcher[P, A] {
+  class FullReceiveMatcherImpl[P, A](val getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
+    extends ReceiveMatcherImpl[P, A] with FullReceiveMatcher[P, A] {
 
     def unwrap[B](f: A => B) =
-      new ReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
+      new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
 
     def unwrapPf[B](f: PartialFunction[A, B]) =
-      new ReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(f.andThen(_ => ok), f)))
+      new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(f.andThen(_ => ok), f)))
 
-    def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): ReceiveMatcher[P, B] = {
+    def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): FullReceiveMatcher[P, B] = {
       // Always true because of `ev` and because `Matcher` is contravariant.
       // In Scala 2.13 we can avoid this with `ev.substituteContra(beAnInstanceOf[B])`.
       val beAnInstanceOfB = beAnInstanceOf[B].asInstanceOf[Matcher[A]]
-      new ReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform[B](beAnInstanceOfB, _.asInstanceOf[B])))
+      new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform[B](beAnInstanceOfB, _.asInstanceOf[B])))
     }
 
     def apply(msg: A) = new CheckedReceiveMatcherImpl(getMessage, msg)
@@ -49,15 +49,15 @@ private[specs2] object Matchers {
     def afterOthers = new AfterOthersReceiveMatcherImpl(getMessage)
   }
 
-  class UntypedReceiveMatcherImpl[P](_getMessage: GetMessageFunc[P, AnyRef])(implicit tf: TimeoutFunc[P])
-    extends ReceiveMatcherImpl[P, Any](_getMessage) with UntypedReceiveMatcher[P] {
+  class UntypedFullReceiveMatcherImpl[P](_getMessage: GetMessageFunc[P, AnyRef])(implicit tf: TimeoutFunc[P])
+    extends FullReceiveMatcherImpl[P, Any](_getMessage) with UntypedFullReceiveMatcher[P] {
 
     def apply[A: ClassTag] =
-      new ReceiveMatcherImpl[P, A](_getMessage.andThen(_.mapTransform[A](beAnInstanceOf[A], _.asInstanceOf[A])))
+      new FullReceiveMatcherImpl[P, A](_getMessage.andThen(_.mapTransform[A](beAnInstanceOf[A], _.asInstanceOf[A])))
   }
 
   class CheckedReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A], check: ValueCheck[A])(implicit tf: TimeoutFunc[P])
-    extends BaseReceiveMatcherImpl[P, A] with SkippableReceiveMatcher[P, A] {
+    extends ReceiveMatcherImpl[P, A] with SkippableReceiveMatcher[P, A] {
 
     val getMessage = _getMessage.andThen(_.mapCheck(check))
 
@@ -65,7 +65,7 @@ private[specs2] object Matchers {
   }
 
   class AfterOthersReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
-    extends BaseReceiveMatcherImpl[P, A] {
+    extends ReceiveMatcherImpl[P, A] {
 
     val getMessage = { (probe: P, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
@@ -85,7 +85,7 @@ private[specs2] object Matchers {
   }
 
   class BaseAllOfReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A], msgs: Seq[A])(implicit tf: TimeoutFunc[P])
-    extends BaseReceiveMatcherImpl[P, Seq[A]] {
+    extends ReceiveMatcherImpl[P, Seq[A]] {
 
     protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[P, A] =
       _getMessage.andThen(_.mapCheck(beOneOf(remMsgs: _*)))

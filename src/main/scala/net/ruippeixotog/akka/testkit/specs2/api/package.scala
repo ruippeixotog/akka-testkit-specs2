@@ -10,9 +10,9 @@ import org.specs2.matcher.Matcher
  */
 package object api {
 
-  trait BaseReceiveMatcher[P, A] extends Matcher[P]
+  trait ReceiveMatcher[P, A] extends Matcher[P]
 
-  trait SkippableReceiveMatcher[P, A] extends BaseReceiveMatcher[P, A] {
+  trait SkippableReceiveMatcher[P, A] extends ReceiveMatcher[P, A] {
 
     /**
      * Skips non-matching messages until a matching one is received or a timeout occurs. Commonly used when the order of
@@ -20,10 +20,10 @@ package object api {
      *
      * @return a new matcher that skips non-matching messages until a matching one is received or a timeout occurs.
      */
-    def afterOthers: BaseReceiveMatcher[P, A]
+    def afterOthers: ReceiveMatcher[P, A]
   }
 
-  trait ReceiveMatcher[P, A] extends SkippableReceiveMatcher[P, A] {
+  trait FullReceiveMatcher[P, A] extends SkippableReceiveMatcher[P, A] {
 
     /**
      * Constrains the received messages to be of a given subtype.
@@ -31,7 +31,7 @@ package object api {
      * @tparam B the expected subtype of messages
      * @return a new matcher that expects a probe to have received messages of type `B`.
      */
-    def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): ReceiveMatcher[P, B]
+    def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): FullReceiveMatcher[P, B]
 
     /**
      * Checks that the received message is equal to the given value.
@@ -74,7 +74,7 @@ package object api {
      * @tparam B the return type of the function
      * @return a new matcher that applies `f` to messages before checking them.
      */
-    def unwrap[B](f: A => B): ReceiveMatcher[P, B]
+    def unwrap[B](f: A => B): FullReceiveMatcher[P, B]
 
     /**
      * Applies a partial function to the received messages before checks. Messages for which the function is undefined
@@ -84,10 +84,10 @@ package object api {
      * @tparam B the return type of the function
      * @return a new matcher that applies `f` to messages before checking them.
      */
-    def unwrapPf[B](f: PartialFunction[A, B]): ReceiveMatcher[P, B]
+    def unwrapPf[B](f: PartialFunction[A, B]): FullReceiveMatcher[P, B]
   }
 
-  trait UntypedReceiveMatcher[P] extends ReceiveMatcher[P, Any] {
+  trait UntypedFullReceiveMatcher[P] extends FullReceiveMatcher[P, Any] {
 
     /**
      * Constrains the received messages to be of a given type.
@@ -95,6 +95,6 @@ package object api {
      * @tparam A the expected type of messages
      * @return a new matcher that expects a probe to have received messages of type `A`.
      */
-    def apply[A: ClassTag]: ReceiveMatcher[P, A]
+    def apply[A: ClassTag]: FullReceiveMatcher[P, A]
   }
 }
