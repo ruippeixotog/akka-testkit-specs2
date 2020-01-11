@@ -76,6 +76,34 @@ class MySpec extends AkkaSpecification {
 }
 ```
 
+## Akka Typed Actors
+
+If you're using the new [Typed Actor API](https://doc.akka.io/docs/akka/current/typed/actors.html) avalilable since Akka 2.6, you can use `AkkaTypedSpecification`, `AkkaTypedSpecificationLike` and `AkkaTypedMatchers` instead of the traits above:
+
+```scala
+class MyTypedSpec extends AkkaTypedSpecification {
+
+  "my typed test probe" should {
+
+    "receive messages" in {
+      val probe = testKit.createTestProbe[String]()
+
+      probe.ref ! "hello" // expect any message
+      probe must receiveMessage
+
+      probe.ref ! "hello" // expect a specific message
+      probe must receive("hello")
+
+      // any of the following are type errors:
+      // probe.ref ! 3
+      // probe must receive(3)
+
+      // (...)
+    }
+  }
+}
+```
+
 ## Copyright
 
-Copyright (c) 2016-2019 Rui Gonçalves. See LICENSE for details.
+Copyright (c) 2016-2020 Rui Gonçalves. See LICENSE for details.
