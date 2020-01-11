@@ -8,7 +8,7 @@ scalaVersion := "2.13.1"
 crossScalaVersions := Seq("2.12.10", "2.13.1")
 
 libraryDependencies ++= Seq(
-  "org.specs2"            %% "specs2-core"                % "4.8.1",
+  "org.specs2"            %% "specs2-core"                % "4.8.3",
   "com.typesafe.akka"     %% "akka-actor-testkit-typed"   % "2.6.1",
   "com.typesafe.akka"     %% "akka-testkit"               % "2.6.1")
 
