@@ -1,4 +1,4 @@
-### 0.3.0 (unreleased)
+### 0.3.0 (Jan 12, 2020)
 
 - New features
   - Added support for typed actors;
