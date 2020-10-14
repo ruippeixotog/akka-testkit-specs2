@@ -1,0 +1,36 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        jdk: [openjdk@1.8]
+        scala: [2.12.10, 2.13.1]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Scala
+        uses: olafurpg/setup-scala@v7
+        with:
+          java-version: ${{ matrix.jdk }}
+
+      - name: Compile
+        run: sbt coverage "++${{ matrix.scala }} compile"
+
+      - name: Run tests
+        run: sbt coverage "++${{ matrix.scala }} test"
+
+      - name: Upload coverage data to Coveralls
+        run: sbt ++${{ matrix.scala }} coverageAggregate coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_FLAG_NAME: Scala ${{ matrix.scala }}
+
+      - name: Check formatting
+        run: git diff --exit-code
