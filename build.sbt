@@ -1,40 +1,55 @@
 import ReleaseTransformations._
 import scalariform.formatter.preferences._
 
-name := "akka-testkit-specs2"
-organization := "net.ruippeixotog"
+organization in ThisBuild := "net.ruippeixotog"
 
-scalaVersion := "2.13.1"
-crossScalaVersions := Seq("2.12.10", "2.13.1")
+lazy val core = (project in file("core"))
+  .settings(commonSettings)
 
-libraryDependencies ++= Seq(
-  "org.specs2"            %% "specs2-core"                % "4.8.3",
-  "com.typesafe.akka"     %% "akka-actor-testkit-typed"   % "2.6.1",
-  "com.typesafe.akka"     %% "akka-testkit"               % "2.6.1")
+lazy val classic = (project in file("classic"))
+  .settings(commonSettings)
+  .dependsOn(core)
 
-scalariformPreferences := scalariformPreferences.value
-  .setPreference(DanglingCloseParenthesis, Prevent)
-  .setPreference(DoubleIndentConstructorArguments, true)
+lazy val typed = (project in file("typed"))
+  .settings(commonSettings)
+  .dependsOn(core)
 
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-}
+lazy val bundle = (project in file("bundle"))
+  .settings(commonSettings)
+  .dependsOn(classic, typed)
 
-publishMavenStyle := true
-publishArtifact in Test := false
-pomIncludeRepository := { _ => false }
+lazy val commonSettings = Seq(
+  scalaVersion := "2.13.1",
+  crossScalaVersions := Seq("2.12.10", "2.13.1"),
 
-licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
-homepage := Some(url("https://github.com/ruippeixotog/akka-testkit-specs2"))
-scmInfo := Some(ScmInfo(
-  url("https://github.com/ruippeixotog/akka-testkit-specs2"),
-  "scm:git:https://github.com/ruippeixotog/akka-testkit-specs2.git"))
-developers := List(
-  Developer("ruippeixotog", "Rui Gonçalves", "ruippeixotog@gmail.com", url("https://github.com/ruippeixotog")))
+  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.8.3"),
+
+  scalariformPreferences := scalariformPreferences.value
+    .setPreference(DanglingCloseParenthesis, Prevent)
+    .setPreference(DoubleIndentConstructorArguments, true),
+
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  },
+
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false },
+
+  licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
+  homepage := Some(url("https://github.com/ruippeixotog/akka-testkit-specs2")),
+  scmInfo := Some(ScmInfo(
+    url("https://github.com/ruippeixotog/akka-testkit-specs2"),
+    "scm:git:https://github.com/ruippeixotog/akka-testkit-specs2.git")),
+  developers := List(
+    Developer("ruippeixotog", "Rui Gonçalves", "ruippeixotog@gmail.com", url("https://github.com/ruippeixotog"))))
+
+// do not publish the root project
+skip in publish := true
 
 releaseCrossBuild := true
 releaseTagComment := s"Release ${(version in ThisBuild).value}"
