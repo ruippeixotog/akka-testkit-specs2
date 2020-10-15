@@ -34,3 +34,10 @@ jobs:
 
       - name: Check formatting
         run: git diff --exit-code
+
+      - name: Publish snapshot version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: sbt ++${{ matrix.scala }} publish
+        env:
+          SONATYPE_USERNAME: ruippeixotog
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
