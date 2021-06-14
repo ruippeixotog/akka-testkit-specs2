@@ -19,10 +19,10 @@ lazy val bundle = (project in file("bundle"))
   .dependsOn(classic, typed)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.3",
-  crossScalaVersions := Seq("2.12.14", "2.13.3"),
+  scalaVersion := "2.13.6",
+  crossScalaVersions := Seq("2.12.12", "2.13.6"),
 
-  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.12.0"),
+  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.12.1"),
 
   scalariformPreferences := scalariformPreferences.value
     .setPreference(DanglingCloseParenthesis, Prevent)
