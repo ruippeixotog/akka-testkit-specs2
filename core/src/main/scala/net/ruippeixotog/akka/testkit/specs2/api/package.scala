@@ -58,11 +58,11 @@ package object api {
     def like[R: AsResult](f: PartialFunction[A, R]): SkippableReceiveMatcher[P, A]
 
     /**
-     * Checks that the probe received a sequence of messages in order. The timeout is applied to the whole sequence and
-     * not per message (i.e. all the messages have to be received before the timeout duration).
+     * Checks that the probe received a sequence of messages, possibly unordered. The timeout is applied to
+     * the whole sequence and not per message (i.e. all the messages have to be received before the timeout duration).
      *
      * @param msgs the expected sequence of messages
-     * @return a new matcher that expects a probe to have received all the messages in `msgs` in order.
+     * @return a new matcher that expects a probe to have received all the messages in `msgs`, possibly unordered.
      */
     def allOf(msgs: A*): SkippableReceiveMatcher[P, Seq[A]]
 
