@@ -22,7 +22,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.13.8",
   crossScalaVersions := Seq("2.12.15", "2.13.8"),
 
-  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.13.2"),
+  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.13.3"),
 
   scalariformPreferences := scalariformPreferences.value
     .setPreference(DanglingCloseParenthesis, Prevent)
