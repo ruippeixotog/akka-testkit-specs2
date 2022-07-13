@@ -3,6 +3,8 @@ import scalariform.formatter.preferences._
 
 ThisBuild / organization := "net.ruippeixotog"
 
+scalaVersion := "2.13.8"
+
 lazy val core = (project in file("core"))
   .settings(commonSettings)
 
@@ -19,7 +21,6 @@ lazy val bundle = (project in file("bundle"))
   .dependsOn(classic, typed)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.8",
   crossScalaVersions := Seq("2.12.15", "2.13.8"),
 
   libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.16.1"),
@@ -50,6 +51,7 @@ lazy val commonSettings = Seq(
 
 // do not publish the root project
 publish / skip := true
+publishArtifact := false
 
 releaseCrossBuild := true
 releaseTagComment := s"Release ${(ThisBuild / version).value}"
