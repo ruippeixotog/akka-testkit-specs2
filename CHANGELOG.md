@@ -1,3 +1,8 @@
+### 0.3.1 (Jul 13, 2022)
+
+- New features
+  - Akka classic and Akka typed matchers are now published as independent modules which can be used independently (`akka-testkit-specs2` will still work as before).
+
 ### 0.3.0 (Jan 12, 2020)
 
 - New features

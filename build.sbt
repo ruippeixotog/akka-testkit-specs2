@@ -1,7 +1,9 @@
 import ReleaseTransformations._
 import scalariform.formatter.preferences._
 
-organization in ThisBuild := "net.ruippeixotog"
+ThisBuild / organization := "net.ruippeixotog"
+
+scalaVersion := "2.13.8"
 
 lazy val core = (project in file("core"))
   .settings(commonSettings)
@@ -19,10 +21,9 @@ lazy val bundle = (project in file("bundle"))
   .dependsOn(classic, typed)
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.8",
   crossScalaVersions := Seq("2.12.15", "2.13.8"),
 
-  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.15.0"),
+  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.16.1"),
 
   scalariformPreferences := scalariformPreferences.value
     .setPreference(DanglingCloseParenthesis, Prevent)
@@ -37,7 +38,7 @@ lazy val commonSettings = Seq(
   },
 
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   pomIncludeRepository := { _ => false },
 
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
@@ -49,11 +50,12 @@ lazy val commonSettings = Seq(
     Developer("ruippeixotog", "Rui Gonçalves", "ruippeixotog@gmail.com", url("https://github.com/ruippeixotog"))))
 
 // do not publish the root project
-skip in publish := true
+publish / skip := true
+publishArtifact := false
 
 releaseCrossBuild := true
-releaseTagComment := s"Release ${(version in ThisBuild).value}"
-releaseCommitMessage := s"Set version to ${(version in ThisBuild).value}"
+releaseTagComment := s"Release ${(ThisBuild / version).value}"
+releaseCommitMessage := s"Set version to ${(ThisBuild / version).value}"
 
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
