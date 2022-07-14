@@ -21,7 +21,7 @@ lazy val bundle = (project in file("bundle"))
   .dependsOn(classic, typed)
 
 lazy val commonSettings = Seq(
-  crossScalaVersions := Seq("2.12.15", "2.13.8"),
+  crossScalaVersions := Seq("2.12.16", "2.13.8"),
 
   libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.16.1"),
 
