@@ -1,5 +1,4 @@
 import ReleaseTransformations._
-import scalariform.formatter.preferences._
 
 ThisBuild / organization := "net.ruippeixotog"
 
@@ -21,13 +20,12 @@ lazy val bundle = (project in file("bundle"))
   .dependsOn(classic, typed)
 
 lazy val commonSettings = Seq(
+  // format: off
   crossScalaVersions := Seq("2.12.16", "2.13.8"),
 
   libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.16.1"),
 
-  scalariformPreferences := scalariformPreferences.value
-    .setPreference(DanglingCloseParenthesis, Prevent)
-    .setPreference(DoubleIndentConstructorArguments, true),
+  scalafmtOnCompile := true,
 
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
@@ -47,7 +45,9 @@ lazy val commonSettings = Seq(
     url("https://github.com/ruippeixotog/akka-testkit-specs2"),
     "scm:git:https://github.com/ruippeixotog/akka-testkit-specs2.git")),
   developers := List(
-    Developer("ruippeixotog", "Rui Gonçalves", "ruippeixotog@gmail.com", url("https://github.com/ruippeixotog"))))
+    Developer("ruippeixotog", "Rui Gonçalves", "ruippeixotog@gmail.com", url("https://github.com/ruippeixotog")))
+  // format: on
+)
 
 // do not publish the root project
 publish / skip := true
@@ -69,4 +69,5 @@ releaseProcess := Seq[ReleaseStep](
   setNextVersion,
   commitNextVersion,
   releaseStepCommandAndRemaining("sonatypeReleaseAll"),
-  pushChanges)
+  pushChanges
+)

@@ -6,10 +6,13 @@ import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ResultMatchers
 import org.specs2.mutable.SpecificationLike
-import org.specs2.specification.{ AfterAll, Scope }
+import org.specs2.specification.{AfterAll, Scope}
 
-class AkkaTypedMatchersSpec(implicit env: ExecutionEnv) extends SpecificationLike
-  with AkkaTypedMatchers with ResultMatchers with AfterAll {
+class AkkaTypedMatchersSpec(implicit env: ExecutionEnv)
+    extends SpecificationLike
+    with AkkaTypedMatchers
+    with ResultMatchers
+    with AfterAll {
 
   val testKit = ActorTestKit()
 
@@ -47,10 +50,12 @@ class AkkaTypedMatchersSpec(implicit env: ExecutionEnv) extends SpecificationLik
       (probe must receive[Option[String]].ofSubtype[Some[String]]) must beSuccessful
       probe.ref ! None
       (probe must receive[Option[String]].ofSubtype[Some[String]]) must beFailing(
-        "Received message 'None' but 'None: scala.None\\$' is not an instance of 'scala.Some'")
+        "Received message 'None' but 'None: scala.None\\$' is not an instance of 'scala.Some'"
+      )
       // no message sent
       (probe must receive[Option[String]].ofSubtype[Some[String]]) must beFailing(
-        s"Timeout \\($timeout\\) while waiting for message")
+        s"Timeout \\($timeout\\) while waiting for message"
+      )
     }
 
     "provide a matcher for receiving messages matching a function" in new ProbeTest[String] {
@@ -77,7 +82,9 @@ class AkkaTypedMatchersSpec(implicit env: ExecutionEnv) extends SpecificationLik
       probe.ref ! None
       (probe must matchTest) must beSuccessful
       probe.ref ! Some("")
-      (probe must matchTest) must beFailing("Received message 'Some\\(\\)' but undefined function for (Some\\(\\)|'Some\\(\\)')")
+      (probe must matchTest) must beFailing(
+        "Received message 'Some\\(\\)' but undefined function for (Some\\(\\)|'Some\\(\\)')"
+      )
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -97,10 +104,12 @@ class AkkaTypedMatchersSpec(implicit env: ExecutionEnv) extends SpecificationLik
       (probe must matchTest) must beFailing("Received message 'd' but 'd' is not contained in 'a, a, b, c'")
       Seq("b", "d").foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
-        "Received message 'b' and received message 'd' but 'd' is not contained in 'a, a, c'")
+        "Received message 'b' and received message 'd' but 'd' is not contained in 'a, a, c'"
+      )
       Seq("a", "b", "d").foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
-        "Received messages 'a, b' and received message 'd' but 'd' is not contained in 'a, c'")
+        "Received messages 'a, b' and received message 'd' but 'd' is not contained in 'a, c'"
+      )
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -147,7 +156,8 @@ class AkkaTypedMatchersSpec(implicit env: ExecutionEnv) extends SpecificationLik
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("ohlla")
       (probe must receiveLetter.which(_ must startWith("h"))) must beFailing(
-        "Received message 'Letter\\(ohlla\\)' but ohlla doesn't start with 'h'")
+        "Received message 'Letter\\(ohlla\\)' but ohlla doesn't start with 'h'"
+      )
       // no message sent
       (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -161,10 +171,12 @@ class AkkaTypedMatchersSpec(implicit env: ExecutionEnv) extends SpecificationLik
       (probe must receiveLetter2) must beSuccessful
       probe.ref ! Letter2("john", "ohlla")
       (probe must receiveLetter2.which(_ must startWith("h"))) must beFailing(
-        "Received message 'Letter2\\(john,ohlla\\)' but ohlla doesn't start with 'h'")
+        "Received message 'Letter2\\(john,ohlla\\)' but ohlla doesn't start with 'h'"
+      )
       probe.ref ! Letter2("mary", "hello")
       (probe must receiveLetter2) must beFailing(
-        s"Received message 'Letter2\\(mary,hello\\)' but undefined function for 'Letter2\\(mary,hello\\)'")
+        s"Received message 'Letter2\\(mary,hello\\)' but undefined function for 'Letter2\\(mary,hello\\)'"
+      )
       // no message sent
       (probe must receiveLetter2) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }

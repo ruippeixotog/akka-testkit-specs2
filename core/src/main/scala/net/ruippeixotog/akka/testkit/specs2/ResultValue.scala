@@ -1,9 +1,9 @@
 package net.ruippeixotog.akka.testkit.specs2
 
-import org.specs2.execute.{ Failure, Result, Success }
+import org.specs2.execute.{Failure, Result, Success}
 import org.specs2.matcher.ValueCheck
 
-import net.ruippeixotog.akka.testkit.specs2.ResultValue.{ CheckFailed, FailureReason, ReceiveTimeout }
+import net.ruippeixotog.akka.testkit.specs2.ResultValue.{CheckFailed, FailureReason, ReceiveTimeout}
 
 sealed trait ResultValue[+A] {
   def result: Result

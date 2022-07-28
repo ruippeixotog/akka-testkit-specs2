@@ -3,14 +3,18 @@ package net.ruippeixotog.akka.testkit.specs2
 import scala.concurrent.duration._
 
 import akka.actor.ActorSystem
-import akka.testkit.{ TestKit, TestProbe }
+import akka.testkit.{TestKit, TestProbe}
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ResultMatchers
 import org.specs2.mutable.SpecificationLike
-import org.specs2.specification.{ AfterAll, Scope }
+import org.specs2.specification.{AfterAll, Scope}
 
-class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()) with SpecificationLike
-  with AkkaMatchers with ResultMatchers with AfterAll {
+class AkkaMatchersSpec(implicit env: ExecutionEnv)
+    extends TestKit(ActorSystem())
+    with SpecificationLike
+    with AkkaMatchers
+    with ResultMatchers
+    with AfterAll {
 
   abstract class ProbeTest extends Scope {
     val probe = TestProbe()
@@ -46,7 +50,8 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receive[String]) must beSuccessful
       probe.ref ! 0.5
       (probe must receive[String]) must beFailing(
-        "Received message '0.5' but '0.5: java.lang.Double' is not an instance of 'java.lang.String'")
+        "Received message '0.5' but '0.5: java.lang.Double' is not an instance of 'java.lang.String'"
+      )
       // no message sent
       (probe must receive[String]) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -60,7 +65,8 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must matchTest) must beFailing("Received message 'ohlla' but ohlla doesn't start with 'h'")
       probe.ref ! 6
       (probe must matchTest) must beFailing(
-        "Received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'")
+        "Received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'"
+      )
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -78,10 +84,13 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       probe.ref ! None
       (probe must matchTest) must beSuccessful
       probe.ref ! Some("")
-      (probe must matchTest) must beFailing("Received message 'Some\\(\\)' but undefined function for (Some\\(\\)|'Some\\(\\)')")
+      (probe must matchTest) must beFailing(
+        "Received message 'Some\\(\\)' but undefined function for (Some\\(\\)|'Some\\(\\)')"
+      )
       probe.ref ! 6
       (probe must matchTest) must beFailing(
-        "Received message '6' but '6: java.lang.Integer' is not an instance of 'scala.Option'")
+        "Received message '6' but '6: java.lang.Integer' is not an instance of 'scala.Option'"
+      )
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -101,13 +110,16 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must matchTest) must beFailing("Received message 'd' but 'd' is not contained in 'a, a, b, c'")
       Seq("b", "d").foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
-        "Received message 'b' and received message 'd' but 'd' is not contained in 'a, a, c'")
+        "Received message 'b' and received message 'd' but 'd' is not contained in 'a, a, c'"
+      )
       Seq("a", "b", "d").foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
-        "Received messages 'a, b' and received message 'd' but 'd' is not contained in 'a, c'")
+        "Received messages 'a, b' and received message 'd' but 'd' is not contained in 'a, c'"
+      )
       Seq("b", 6).foreach { probe.ref ! _ }
       (probe must matchTest) must beFailing(
-        "Received message 'b' and received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'")
+        "Received message 'b' and received message '6' but '6: java.lang.Integer' is not an instance of 'java.lang.String'"
+      )
       // no message sent
       (probe must matchTest) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -163,7 +175,8 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("ohlla")
       (probe must receiveLetter.which(_ must startWith("h"))) must beFailing(
-        "Received message 'Letter\\(ohlla\\)' but ohlla doesn't start with 'h'")
+        "Received message 'Letter\\(ohlla\\)' but ohlla doesn't start with 'h'"
+      )
       // no message sent
       (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
@@ -176,10 +189,12 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv) extends TestKit(ActorSystem()
       (probe must receiveLetter) must beSuccessful
       probe.ref ! Letter("john", "ohlla")
       (probe must receiveLetter.which(_ must startWith("h"))) must beFailing(
-        "Received message 'Letter\\(john,ohlla\\)' but ohlla doesn't start with 'h'")
+        "Received message 'Letter\\(john,ohlla\\)' but ohlla doesn't start with 'h'"
+      )
       probe.ref ! Letter("mary", "hello")
       (probe must receiveLetter) must beFailing(
-        s"Received message 'Letter\\(mary,hello\\)' but undefined function for 'Letter\\(mary,hello\\)'")
+        s"Received message 'Letter\\(mary,hello\\)' but undefined function for 'Letter\\(mary,hello\\)'"
+      )
       // no message sent
       (probe must receiveLetter) must beFailing(s"Timeout \\($timeout\\) while waiting for message")
     }
