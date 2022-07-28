@@ -24,8 +24,8 @@ class MySpec extends AkkaSpecification {
       this must receive[String].which(_ must startWith("h"))
 
       testActor ! Some("hello") // expect a message matching a partial function
-      this must receive.like {
-        case Some(s: String) => s must startWith("h")
+      this must receive.like { case Some(s: String) =>
+        s must startWith("h")
       }
 
       testActor ! "b" // expect several messages, possibly unordered

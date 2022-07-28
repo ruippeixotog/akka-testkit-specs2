@@ -1,18 +1,18 @@
 package net.ruippeixotog.akka.testkit.specs2.impl
 
 import scala.annotation.tailrec
-import scala.concurrent.duration.{ FiniteDuration, _ }
+import scala.concurrent.duration.{FiniteDuration, _}
 import scala.reflect.ClassTag
 
-import org.specs2.execute.{ AsResult, Success }
-import org.specs2.matcher.Matchers.{ beOneOf, _ }
+import org.specs2.execute.{AsResult, Success}
+import org.specs2.matcher.Matchers.{beOneOf, _}
 import org.specs2.matcher.StandardMatchResults.ok
-import org.specs2.matcher.{ Expectable, MatchResult, Matcher, ValueCheck }
+import org.specs2.matcher.{Expectable, MatchResult, Matcher, ValueCheck}
 
-import net.ruippeixotog.akka.testkit.specs2.ResultValue.{ CheckFailed, ReceiveTimeout }
+import net.ruippeixotog.akka.testkit.specs2.ResultValue.{CheckFailed, ReceiveTimeout}
 import net.ruippeixotog.akka.testkit.specs2.Util._
 import net.ruippeixotog.akka.testkit.specs2.api._
-import net.ruippeixotog.akka.testkit.specs2.{ FailureValue, ResultValue, SuccessValue }
+import net.ruippeixotog.akka.testkit.specs2.{FailureValue, ResultValue, SuccessValue}
 
 private[specs2] object Matchers {
 
@@ -27,7 +27,8 @@ private[specs2] object Matchers {
   }
 
   class FullReceiveMatcherImpl[P, A](val getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
-    extends ReceiveMatcherImpl[P, A] with FullReceiveMatcher[P, A] {
+      extends ReceiveMatcherImpl[P, A]
+      with FullReceiveMatcher[P, A] {
 
     def unwrap[B](f: A => B) =
       new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
@@ -50,14 +51,17 @@ private[specs2] object Matchers {
   }
 
   class UntypedFullReceiveMatcherImpl[P](_getMessage: GetMessageFunc[P, AnyRef])(implicit tf: TimeoutFunc[P])
-    extends FullReceiveMatcherImpl[P, Any](_getMessage) with UntypedFullReceiveMatcher[P] {
+      extends FullReceiveMatcherImpl[P, Any](_getMessage)
+      with UntypedFullReceiveMatcher[P] {
 
     def apply[A: ClassTag] =
       new FullReceiveMatcherImpl[P, A](_getMessage.andThen(_.mapTransform[A](beAnInstanceOf[A], _.asInstanceOf[A])))
   }
 
-  class CheckedReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A], check: ValueCheck[A])(implicit tf: TimeoutFunc[P])
-    extends ReceiveMatcherImpl[P, A] with SkippableReceiveMatcher[P, A] {
+  class CheckedReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A], check: ValueCheck[A])(implicit
+      tf: TimeoutFunc[P]
+  ) extends ReceiveMatcherImpl[P, A]
+      with SkippableReceiveMatcher[P, A] {
 
     val getMessage = _getMessage.andThen(_.mapCheck(check))
 
@@ -65,7 +69,7 @@ private[specs2] object Matchers {
   }
 
   class AfterOthersReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
-    extends ReceiveMatcherImpl[P, A] {
+      extends ReceiveMatcherImpl[P, A] {
 
     val getMessage = { (probe: P, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
@@ -85,7 +89,7 @@ private[specs2] object Matchers {
   }
 
   class BaseAllOfReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A], msgs: Seq[A])(implicit tf: TimeoutFunc[P])
-    extends ReceiveMatcherImpl[P, Seq[A]] {
+      extends ReceiveMatcherImpl[P, Seq[A]] {
 
     protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[P, A] =
       _getMessage.andThen(_.mapCheck(beOneOf(remMsgs: _*)))
@@ -103,10 +107,12 @@ private[specs2] object Matchers {
             case r @ FailureValue(res, CheckFailed) =>
               received match {
                 case Nil => r
-                case recvMsg +: Nil => FailureValue.failedCheck(
-                  s"Received message '$recvMsg' and ${res.message.uncapitalize}")
-                case recvMsgs => FailureValue.failedCheck(
-                  s"Received messages '${recvMsgs.mkString(", ")}' and ${res.message.uncapitalize}")
+                case recvMsg +: Nil =>
+                  FailureValue.failedCheck(s"Received message '$recvMsg' and ${res.message.uncapitalize}")
+                case recvMsgs =>
+                  FailureValue.failedCheck(
+                    s"Received messages '${recvMsgs.mkString(", ")}' and ${res.message.uncapitalize}"
+                  )
               }
 
             case FailureValue(_, ReceiveTimeout) =>
@@ -121,13 +127,15 @@ private[specs2] object Matchers {
   }
 
   class AllOfReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A], msgs: Seq[A])(implicit tf: TimeoutFunc[P])
-    extends BaseAllOfReceiveMatcherImpl[P, A](_getMessage, msgs) with SkippableReceiveMatcher[P, Seq[A]] {
+      extends BaseAllOfReceiveMatcherImpl[P, A](_getMessage, msgs)
+      with SkippableReceiveMatcher[P, Seq[A]] {
 
     def afterOthers = new AllOfAfterOthersReceiveMatcher(_getMessage, msgs)
   }
 
-  class AllOfAfterOthersReceiveMatcher[P, A](_getMessage: GetMessageFunc[P, A], msgs: Seq[A])(implicit tf: TimeoutFunc[P])
-    extends BaseAllOfReceiveMatcherImpl[P, A](_getMessage, msgs) {
+  class AllOfAfterOthersReceiveMatcher[P, A](_getMessage: GetMessageFunc[P, A], msgs: Seq[A])(implicit
+      tf: TimeoutFunc[P]
+  ) extends BaseAllOfReceiveMatcherImpl[P, A](_getMessage, msgs) {
 
     override protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[P, A] =
       new AfterOthersReceiveMatcherImpl(super.getRemainingMessages(remMsgs)).getMessage

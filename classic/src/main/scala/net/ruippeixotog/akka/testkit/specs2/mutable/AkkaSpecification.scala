@@ -8,7 +8,8 @@ import akka.testkit.TestKit
 import AkkaSpecification._
 
 abstract class AkkaSpecification(_system: ActorSystem = actorSystemForClass(getClass))
-  extends TestKit(_system) with AkkaSpecificationLike
+    extends TestKit(_system)
+    with AkkaSpecificationLike
 
 object AkkaSpecification {
   private def sanitizeName(name: String) = name.replaceAll("[^a-zA-Z0-9-]", "_")
