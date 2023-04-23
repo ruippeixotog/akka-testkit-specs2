@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        jdk: [adopt@1.8]
+        jdk: ['adopt:1.8']
         scala: ['2.12', '2.13', '3']
         include:
           - scala: '2.12'
@@ -20,12 +20,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Scala
-        uses: olafurpg/setup-scala@v13
+        uses: coursier/setup-action@v1
         with:
-          java-version: ${{ matrix.jdk }}
+          jvm: ${{ matrix.jdk }}
 
       - name: Compile
         run: sbt coverage "++${{ matrix.scala-version }} compile"
