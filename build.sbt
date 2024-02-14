@@ -19,6 +19,18 @@ lazy val bundle = (project in file("bundle"))
   .settings(commonSettings)
   .dependsOn(classic, typed)
 
+lazy val pekkoClassic = (project in file("pekko-classic"))
+  .settings(commonSettings)
+  .dependsOn(core)
+
+lazy val pekkoTyped = (project in file("pekko-typed"))
+  .settings(commonSettings)
+  .dependsOn(core)
+
+lazy val pekkoBundle = (project in file("pekko-bundle"))
+  .settings(commonSettings)
+  .dependsOn(pekkoClassic, pekkoTyped)
+
 lazy val commonSettings = Seq(
   // format: off
   crossScalaVersions := Seq("2.12.18", "2.13.12", "3.3.1"),
