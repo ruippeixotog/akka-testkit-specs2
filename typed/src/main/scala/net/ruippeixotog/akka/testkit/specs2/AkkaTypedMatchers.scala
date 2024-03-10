@@ -4,7 +4,7 @@ import scala.concurrent.duration.FiniteDuration
 
 import akka.actor.testkit.typed.scaladsl.TestProbe
 
-import net.ruippeixotog.akka.testkit.specs2.interop.TypedMatchers
+import net.ruippeixotog.akka.testkit.specs2.impl.TypedMatchers
 
 trait AkkaTypedMatchers extends TypedMatchers[TestProbe] {
   protected def defaultReceiveTimeout[Msg](testkit: TestProbe[Msg]): FiniteDuration =

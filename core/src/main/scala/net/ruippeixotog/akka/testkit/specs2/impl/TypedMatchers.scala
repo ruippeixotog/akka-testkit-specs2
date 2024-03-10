@@ -1,4 +1,4 @@
-package net.ruippeixotog.akka.testkit.specs2.interop
+package net.ruippeixotog.akka.testkit.specs2.impl
 
 import net.ruippeixotog.akka.testkit.specs2.ResultValue.ReceiveTimeout
 import net.ruippeixotog.akka.testkit.specs2.api._
@@ -7,7 +7,7 @@ import net.ruippeixotog.akka.testkit.specs2.{FailureValue, SuccessValue}
 import org.specs2.execute.{Failure, Success}
 import scala.concurrent.duration.FiniteDuration
 
-trait TypedMatchers[TestProbe[_]] {
+private[ruippeixotog] trait TypedMatchers[TestProbe[_]] {
   protected def defaultReceiveTimeout[Msg](testkit: TestProbe[Msg]): FiniteDuration
   protected def receiveOne[Msg](probe: TestProbe[Msg], timeout: FiniteDuration): Msg
 

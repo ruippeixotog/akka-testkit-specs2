@@ -4,7 +4,7 @@ import scala.concurrent.duration.FiniteDuration
 
 import akka.testkit.TestKitBase
 
-import net.ruippeixotog.akka.testkit.specs2.interop.ClassicMatchers
+import net.ruippeixotog.akka.testkit.specs2.impl.ClassicMatchers
 
 trait AkkaMatchers extends ClassicMatchers[TestKitBase] {
   protected def defaultReceiveTimeout(testkit: TestKitBase): FiniteDuration =
