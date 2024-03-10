@@ -1,8 +1,8 @@
-package net.ruippeixotog.akka.testkit.specs2
+package net.ruippeixotog.pekko.testkit.specs2
 
 import scala.concurrent.duration._
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.PekkoSpecification
+import net.ruippeixotog.pekko.testkit.specs2.mutable.PekkoSpecification
 
 class MySpec extends PekkoSpecification {
   // testActor is not thread-safe; use `TestProbe` instances per example when possible!

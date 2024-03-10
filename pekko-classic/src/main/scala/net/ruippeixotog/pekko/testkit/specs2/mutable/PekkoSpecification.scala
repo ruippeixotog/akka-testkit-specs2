@@ -1,4 +1,4 @@
-package net.ruippeixotog.akka.testkit.specs2.mutable
+package net.ruippeixotog.pekko.testkit.specs2.mutable
 
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package net.ruippeixotog.akka.testkit.specs2
+package net.ruippeixotog.pekko.testkit.specs2
 
 import scala.concurrent.duration._
 

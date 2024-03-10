@@ -1,6 +1,6 @@
-package net.ruippeixotog.akka.testkit.specs2
+package net.ruippeixotog.pekko.testkit.specs2
 
-import net.ruippeixotog.akka.testkit.specs2.mutable.PekkoTypedSpecification
+import net.ruippeixotog.pekko.testkit.specs2.mutable.PekkoTypedSpecification
 
 class MyTypedSpec extends PekkoTypedSpecification {
 
