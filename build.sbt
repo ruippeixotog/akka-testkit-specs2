@@ -7,17 +7,17 @@ ThisBuild / scalaVersion := "2.13.12"
 lazy val core = (project in file("core"))
   .settings(commonSettings)
 
-lazy val classic = (project in file("classic"))
+lazy val akkaClassic = (project in file("akka-classic"))
   .settings(commonSettings)
   .dependsOn(core)
 
-lazy val typed = (project in file("typed"))
+lazy val akkaTyped = (project in file("akka-typed"))
   .settings(commonSettings)
   .dependsOn(core)
 
-lazy val bundle = (project in file("bundle"))
+lazy val akkaBundle = (project in file("akka-bundle"))
   .settings(commonSettings)
-  .dependsOn(classic, typed)
+  .dependsOn(akkaClassic, akkaTyped)
 
 lazy val pekkoClassic = (project in file("pekko-classic"))
   .settings(commonSettings)
