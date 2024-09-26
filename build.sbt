@@ -2,7 +2,7 @@ import ReleaseTransformations._
 
 ThisBuild / organization := "net.ruippeixotog"
 
-ThisBuild / scalaVersion := "2.13.14"
+ThisBuild / scalaVersion := "2.13.15"
 
 lazy val core = (project in file("core"))
   .settings(commonSettings)
@@ -21,7 +21,7 @@ lazy val bundle = (project in file("bundle"))
 
 lazy val commonSettings = Seq(
   // format: off
-  crossScalaVersions := Seq("2.12.20", "2.13.14", "3.5.1"),
+  crossScalaVersions := Seq("2.12.20", "2.13.15", "3.5.1"),
 
   libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.20.8"),
 
