@@ -23,7 +23,7 @@ lazy val commonSettings = Seq(
   // format: off
   crossScalaVersions := Seq("2.12.20", "2.13.15", "3.5.1"),
 
-  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.20.8"),
+  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.20.9"),
 
   scalafmtOnCompile := true,
 
