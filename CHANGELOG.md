@@ -1,3 +1,8 @@
+### 0.3.3 (Mar 10, 2025)
+
+- New features
+  - Added support for Pekko
+
 ### 0.3.2 (Nov 22, 2022)
 
 Updated dependency versions (specs 4.19.0 + akka 2.6.2) and added support for Scala 3.
