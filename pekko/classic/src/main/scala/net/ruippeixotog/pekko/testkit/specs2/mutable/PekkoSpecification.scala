@@ -13,5 +13,5 @@ abstract class PekkoSpecification(_system: ActorSystem = actorSystemForClass(get
 
 object PekkoSpecification {
   private def sanitizeName(name: String) = name.replaceAll("[^a-zA-Z0-9-]", "_")
-  private def actorSystemForClass(clazz: Class[_]) = ActorSystem(sanitizeName(clazz.getName) + "_" + UUID.randomUUID())
+  private def actorSystemForClass(clazz: Class[?]) = ActorSystem(sanitizeName(clazz.getName) + "_" + UUID.randomUUID())
 }

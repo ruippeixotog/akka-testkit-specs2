@@ -30,10 +30,10 @@ private[specs2] object Matchers {
       extends ReceiveMatcherImpl[P, A]
       with FullReceiveMatcher[P, A] {
 
-    def unwrap[B](f: A => B) =
+    def unwrap[B](f: A => B): FullReceiveMatcher[P, B] =
       new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
 
-    def unwrapPf[B](f: PartialFunction[A, B]) =
+    def unwrapPf[B](f: PartialFunction[A, B]): FullReceiveMatcher[P, B] =
       new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(f.andThen(_ => ok), f)))
 
     def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): FullReceiveMatcher[P, B] = {
@@ -43,18 +43,23 @@ private[specs2] object Matchers {
       new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform[B](beAnInstanceOfB, _.asInstanceOf[B])))
     }
 
-    def apply(msg: A) = new CheckedReceiveMatcherImpl(getMessage, msg)
-    def which[R: AsResult](f: A => R) = new CheckedReceiveMatcherImpl(getMessage, f)
-    def like[R: AsResult](f: PartialFunction[A, R]) = new CheckedReceiveMatcherImpl(getMessage, f)
-    def allOf(msgs: A*) = new AllOfReceiveMatcherImpl(getMessage, msgs)
-    def afterOthers = new AfterOthersReceiveMatcherImpl(getMessage)
+    def apply(msg: A): SkippableReceiveMatcher[P, A] = new CheckedReceiveMatcherImpl(getMessage, msg)
+
+    def which[R: AsResult](f: A => R): SkippableReceiveMatcher[P, A] = new CheckedReceiveMatcherImpl(getMessage, f)
+
+    def like[R: AsResult](f: PartialFunction[A, R]): SkippableReceiveMatcher[P, A] =
+      new CheckedReceiveMatcherImpl(getMessage, f)
+
+    def allOf(msgs: A*): SkippableReceiveMatcher[P, Seq[A]] = new AllOfReceiveMatcherImpl(getMessage, msgs)
+
+    def afterOthers: ReceiveMatcher[P, A] = new AfterOthersReceiveMatcherImpl(getMessage)
   }
 
   class UntypedFullReceiveMatcherImpl[P](_getMessage: GetMessageFunc[P, AnyRef])(implicit tf: TimeoutFunc[P])
       extends FullReceiveMatcherImpl[P, Any](_getMessage)
       with UntypedFullReceiveMatcher[P] {
 
-    def apply[A: ClassTag] =
+    def apply[A: ClassTag]: FullReceiveMatcher[P, A] =
       new FullReceiveMatcherImpl[P, A](_getMessage.andThen(_.mapTransform[A](beAnInstanceOf[A], _.asInstanceOf[A])))
   }
 
@@ -65,7 +70,7 @@ private[specs2] object Matchers {
 
     val getMessage = _getMessage.andThen(_.mapCheck(check))
 
-    def afterOthers = new AfterOthersReceiveMatcherImpl(getMessage)
+    def afterOthers: ReceiveMatcher[P, A] = new AfterOthersReceiveMatcherImpl(getMessage)
   }
 
   class AfterOthersReceiveMatcherImpl[P, A](_getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
@@ -92,7 +97,7 @@ private[specs2] object Matchers {
       extends ReceiveMatcherImpl[P, Seq[A]] {
 
     protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[P, A] =
-      _getMessage.andThen(_.mapCheck(beOneOf(remMsgs: _*)))
+      _getMessage.andThen(_.mapCheck(beOneOf(remMsgs *)))
 
     val getMessage = { (probe: P, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
@@ -130,7 +135,7 @@ private[specs2] object Matchers {
       extends BaseAllOfReceiveMatcherImpl[P, A](_getMessage, msgs)
       with SkippableReceiveMatcher[P, Seq[A]] {
 
-    def afterOthers = new AllOfAfterOthersReceiveMatcher(_getMessage, msgs)
+    def afterOthers: ReceiveMatcher[P, Seq[A]] = new AllOfAfterOthersReceiveMatcher(_getMessage, msgs)
   }
 
   class AllOfAfterOthersReceiveMatcher[P, A](_getMessage: GetMessageFunc[P, A], msgs: Seq[A])(implicit

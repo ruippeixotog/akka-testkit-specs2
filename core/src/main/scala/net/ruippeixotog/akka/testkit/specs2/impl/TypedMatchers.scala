@@ -11,7 +11,7 @@ private[ruippeixotog] trait TypedMatchers[TestProbe[_]] {
   protected def defaultReceiveTimeout[Msg](testkit: TestProbe[Msg]): FiniteDuration
   protected def receiveOne[Msg](probe: TestProbe[Msg], timeout: FiniteDuration): Msg
 
-  private[this] def pekkoTypedReceiveMatcher[Msg](
+  private def pekkoTypedReceiveMatcher[Msg](
       receiveOkMsg: Msg => String,
       receiveKoMsg: FiniteDuration => String,
       timeoutFunc: TestProbe[Msg] => FiniteDuration

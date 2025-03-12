@@ -11,7 +11,7 @@ private[ruippeixotog] trait ClassicMatchers[TestKitBase] {
   protected def defaultReceiveTimeout(testkit: TestKitBase): FiniteDuration
   protected def receiveOne(probe: TestKitBase, timeout: FiniteDuration): AnyRef
 
-  private[this] def classicReceiveMatcher(
+  private def classicReceiveMatcher(
       receiveOkMsg: AnyRef => String,
       receiveKoMsg: FiniteDuration => String,
       timeoutFunc: TestKitBase => FiniteDuration
