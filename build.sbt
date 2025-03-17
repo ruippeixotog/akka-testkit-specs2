@@ -35,7 +35,7 @@ lazy val commonSettings = Seq(
   // format: off
   crossScalaVersions := Seq("2.13.16", "3.6.4"),
 
-  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.20.9"),
+  libraryDependencies ++= Seq("org.specs2" %% "specs2-core" % "4.21.0"),
 
   scalacOptions ++= (
     CrossVersion.partialVersion(scalaVersion.value) match {
