@@ -1,3 +1,7 @@
+### 0.3.4 (Jun 26, 2025)
+
+Updated dependency versions.
+
 ### 0.3.3 (Mar 10, 2025)
 
 - New features
