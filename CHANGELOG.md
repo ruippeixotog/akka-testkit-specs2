@@ -1,3 +1,7 @@
+### 0.3.5 (Jul 2, 2025)
+
+Fix incorrectly bumped Scala 3 version, reverting it to Scala 3.3 (LTS).
+
 ### 0.3.4 (Jun 26, 2025)
 
 Updated dependency versions.
