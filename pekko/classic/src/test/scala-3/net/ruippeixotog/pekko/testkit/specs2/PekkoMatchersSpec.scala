@@ -7,14 +7,16 @@ import org.apache.pekko.testkit.{TestKit, TestProbe}
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ResultMatchers
 import org.specs2.mutable.SpecificationLike
-import org.specs2.specification.{AfterAll, Scope}
+import org.specs2.specification.AfterSpec
+import org.specs2.execute.Scope
+import org.specs2.specification.core.Fragments
 
 class PekkoMatchersSpec(implicit env: ExecutionEnv)
     extends TestKit(ActorSystem())
     with SpecificationLike
     with PekkoMatchers
     with ResultMatchers
-    with AfterAll {
+    with AfterSpec {
 
   abstract class ProbeTest extends Scope {
     val probe = TestProbe()
@@ -238,8 +240,8 @@ class PekkoMatchersSpec(implicit env: ExecutionEnv)
 
     "work as expected with untyped function matchers and messages" in new ProbeTest {
       val matchTest = receive.like {
-        case str: String => str mustEqual "str"
-        case n: Int => n mustEqual 42
+        case str: String => str === "str"
+        case n: Int => n === 42
       }
 
       probe.ref ! "a"
@@ -251,5 +253,5 @@ class PekkoMatchersSpec(implicit env: ExecutionEnv)
     }
   }
 
-  def afterAll(): Unit = shutdown()
+  def afterSpec: Fragments = step(shutdown())
 }
