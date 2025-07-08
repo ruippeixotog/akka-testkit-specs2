@@ -2,6 +2,7 @@ package net.ruippeixotog.pekko.testkit.specs2.mutable
 
 import org.apache.pekko.actor.ActorSystem
 import org.specs2.concurrent.ExecutionEnv
+import org.apache.pekko.testkit.TestKitBase
 
 class PekkoSpecificationSpec(implicit env: ExecutionEnv) extends PekkoSpecification {
 
@@ -9,7 +10,7 @@ class PekkoSpecificationSpec(implicit env: ExecutionEnv) extends PekkoSpecificat
 
     "provide an actor system, a test actor and appropriate matchers" in {
       testActor ! "hello"
-      this must receive("hello")
+      (this: TestKitBase) must receive("hello")
     }
 
     "terminate the actor system when the spec finishes" in {
