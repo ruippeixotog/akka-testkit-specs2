@@ -8,22 +8,22 @@ class UtilSpec extends Specification {
 
   "The Util object" should {
 
-    "proide a method `andThen` to Function2 instances" in {
+    "provide a method `andThen` to Function2 instances" in {
       val take = { (str: String, n: Int) => str.take(n) }
       val length = { (str: String) => str.length }
       val takeLength = take.andThen(length)
 
-      takeLength("abcde", 2) mustEqual 2
-      takeLength("abcde", 10) mustEqual 5
-      takeLength("", 2) mustEqual 0
+      takeLength("abcde", 2) === 2
+      takeLength("abcde", 10) === 5
+      takeLength("", 2) === 0
     }
 
     "provide a method `uncapitalize` to strings" in {
-      "".uncapitalize mustEqual ""
-      "A".uncapitalize mustEqual "a"
-      "One method".uncapitalize mustEqual "one method"
-      "this is lowercase".uncapitalize mustEqual "this is lowercase"
-      "¿que?".uncapitalize mustEqual "¿que?"
+      "".uncapitalize === ""
+      "A".uncapitalize === "a"
+      "One method".uncapitalize === "one method"
+      "this is lowercase".uncapitalize === "this is lowercase"
+      "¿que?".uncapitalize === "¿que?"
     }
   }
 }
