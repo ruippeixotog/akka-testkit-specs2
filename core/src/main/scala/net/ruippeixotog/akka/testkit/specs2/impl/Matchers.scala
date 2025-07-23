@@ -5,9 +5,10 @@ import scala.concurrent.duration.{FiniteDuration, _}
 import scala.reflect.ClassTag
 
 import org.specs2.execute.{AsResult, Success}
-import org.specs2.matcher.Matchers.{beOneOf, _}
-import org.specs2.matcher.StandardMatchResults.ok
-import org.specs2.matcher.{Expectable, MatchResult, Matcher, ValueCheck}
+import org.specs2.matcher.Matchers._
+import org.specs2.matcher.{Matcher, ValueCheck}
+import net.ruippeixotog.akka.testkit.specs2.impl.CompatImplicits._
+import net.ruippeixotog.akka.testkit.specs2.impl.CompatMatchers.{ReceiveMatcherImpl, partialToOk}
 
 import net.ruippeixotog.akka.testkit.specs2.ResultValue.{CheckFailed, ReceiveTimeout}
 import net.ruippeixotog.akka.testkit.specs2.Util._
@@ -19,13 +20,6 @@ private[specs2] object Matchers {
   type TimeoutFunc[P] = P => FiniteDuration
   type GetMessageFunc[P, +A] = (P, FiniteDuration) => ResultValue[A]
 
-  abstract class ReceiveMatcherImpl[P, A](implicit tf: TimeoutFunc[P]) extends ReceiveMatcher[P, A] {
-    def getMessage: GetMessageFunc[P, A]
-
-    def apply[S <: P](t: Expectable[S]): MatchResult[S] =
-      result(getMessage(t.value, tf(t.value)).result, t)
-  }
-
   class FullReceiveMatcherImpl[P, A](val getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
       extends ReceiveMatcherImpl[P, A]
       with FullReceiveMatcher[P, A] {
@@ -34,7 +28,7 @@ private[specs2] object Matchers {
       new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
 
     def unwrapPf[B](f: PartialFunction[A, B]): FullReceiveMatcher[P, B] =
-      new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(f.andThen(_ => ok), f)))
+      new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(partialToOk(f), f)))
 
     def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): FullReceiveMatcher[P, B] = {
       // Always true because of `ev` and because `Matcher` is contravariant.
@@ -97,7 +91,7 @@ private[specs2] object Matchers {
       extends ReceiveMatcherImpl[P, Seq[A]] {
 
     protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[P, A] =
-      _getMessage.andThen(_.mapCheck(beOneOf(remMsgs *)))
+      CompatMatchers.getRemainingMessages(_getMessage, remMsgs)
 
     val getMessage = { (probe: P, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
