@@ -1,16 +1,17 @@
 package net.ruippeixotog.akka.testkit.specs2.impl
 
+import org.specs2.execute.AsResult.given
+import org.specs2.execute.Result
+import org.specs2.matcher.Expectable
+import org.specs2.matcher.ExpectedResults.ok
+import org.specs2.matcher.Matchers._
+import org.specs2.matcher.ValueCheck
+import org.specs2.matcher.ValueChecks.given
+
+import net.ruippeixotog.akka.testkit.specs2.Util._
 import net.ruippeixotog.akka.testkit.specs2.api.ReceiveMatcher
 import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.TimeoutFunc
 import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.GetMessageFunc
-import org.specs2.matcher.Expectable
-import org.specs2.execute.Result
-import org.specs2.matcher.ValueCheck
-import org.specs2.matcher.ExpectedResults.ok
-import org.specs2.matcher.ValueChecks.given
-import net.ruippeixotog.akka.testkit.specs2.Util._
-import org.specs2.matcher.Matchers._
-import org.specs2.execute.AsResult.given
 
 object CompatMatchers {
   abstract class ReceiveMatcherImpl[P, A](implicit tf: TimeoutFunc[P]) extends ReceiveMatcher[P, A] {

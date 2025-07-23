@@ -6,6 +6,7 @@ import org.apache.pekko.actor.testkit.typed.scaladsl.ActorTestKit
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ResultMatchers
 import org.specs2.mutable.SpecificationLike
+
 import net.ruippeixotog.akka.testkit.specs2.AfterAllCompat
 import net.ruippeixotog.akka.testkit.specs2.ScopeCompat
 

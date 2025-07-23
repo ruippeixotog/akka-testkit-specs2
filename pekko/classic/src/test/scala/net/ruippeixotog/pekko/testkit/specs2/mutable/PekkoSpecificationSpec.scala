@@ -1,8 +1,8 @@
 package net.ruippeixotog.pekko.testkit.specs2.mutable
 
 import org.apache.pekko.actor.ActorSystem
-import org.specs2.concurrent.ExecutionEnv
 import org.apache.pekko.testkit.TestKitBase
+import org.specs2.concurrent.ExecutionEnv
 
 class PekkoSpecificationSpec(implicit env: ExecutionEnv) extends PekkoSpecification {
 

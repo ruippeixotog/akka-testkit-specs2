@@ -1,8 +1,8 @@
 package net.ruippeixotog.akka.testkit.specs2.mutable
 
 import akka.actor.ActorSystem
-import org.specs2.concurrent.ExecutionEnv
 import akka.testkit.TestKitBase
+import org.specs2.concurrent.ExecutionEnv
 
 class AkkaSpecificationSpec(implicit env: ExecutionEnv) extends AkkaSpecification {
 
