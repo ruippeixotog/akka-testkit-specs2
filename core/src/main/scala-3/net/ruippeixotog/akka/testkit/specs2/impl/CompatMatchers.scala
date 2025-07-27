@@ -14,12 +14,11 @@ import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.TimeoutFunc
 import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.GetMessageFunc
 
 object CompatMatchers {
-  abstract class ReceiveMatcherImpl[P, A](implicit tf: TimeoutFunc[P]) extends ReceiveMatcher[P, A] {
-    def getMessage: GetMessageFunc[P, A]
+  type MatcherResult[_] = Result
 
-    def apply[S <: P](t: Expectable[S]): Result =
-      getMessage(t.value, tf(t.value)).result
-  }
+  def createMatcher[P, A, S <: P, R](getMessage: GetMessageFunc[P, A], t: Expectable[S])(implicit
+      tf: TimeoutFunc[P]
+  ): MatcherResult[S] = getMessage(t.value, tf(t.value)).result
 
   def getRemainingMessages[P, A](_getMessage: GetMessageFunc[P, A], remMsgs: Seq[A]): GetMessageFunc[P, A] =
     _getMessage.andThen(_.mapCheck(beOneOf[A](remMsgs *).check))
