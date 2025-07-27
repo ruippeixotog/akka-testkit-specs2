@@ -16,12 +16,12 @@ import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.GetMessageFunc
 object CompatMatchers {
   type MatcherResult[_] = Result
 
+  val okResult = ok
+
   def createMatcher[P, A, S <: P, R](getMessage: GetMessageFunc[P, A], t: Expectable[S])(implicit
       tf: TimeoutFunc[P]
   ): MatcherResult[S] = getMessage(t.value, tf(t.value)).result
 
   def getRemainingMessages[P, A](_getMessage: GetMessageFunc[P, A], remMsgs: Seq[A]): GetMessageFunc[P, A] =
     _getMessage.andThen(_.mapCheck(beOneOf[A](remMsgs *).check))
-
-  def partialToOk[A, B](f: PartialFunction[A, B]): ValueCheck[A] = f.andThen(_ => ok)
 }

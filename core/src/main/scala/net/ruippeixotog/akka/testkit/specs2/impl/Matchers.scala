@@ -8,7 +8,7 @@ import org.specs2.execute.{AsResult, Success}
 import org.specs2.matcher.Matchers._
 import org.specs2.matcher.{Expectable, Matcher, ValueCheck}
 import net.ruippeixotog.akka.testkit.specs2.impl.CompatImplicits._
-import net.ruippeixotog.akka.testkit.specs2.impl.CompatMatchers.{MatcherResult, partialToOk}
+import net.ruippeixotog.akka.testkit.specs2.impl.CompatMatchers.{MatcherResult, okResult}
 
 import net.ruippeixotog.akka.testkit.specs2.ResultValue.{CheckFailed, ReceiveTimeout}
 import net.ruippeixotog.akka.testkit.specs2.Util._
@@ -35,7 +35,7 @@ private[specs2] object Matchers {
       new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(ValueCheck.alwaysOk, f)))
 
     def unwrapPf[B](f: PartialFunction[A, B]): FullReceiveMatcher[P, B] =
-      new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(partialToOk(f), f)))
+      new FullReceiveMatcherImpl[P, B](getMessage.andThen(_.mapTransform(f.andThen(_ => okResult), f)))
 
     def ofSubtype[B <: A: ClassTag](implicit ev: A <:< AnyRef): FullReceiveMatcher[P, B] = {
       // Always true because of `ev` and because `Matcher` is contravariant.
