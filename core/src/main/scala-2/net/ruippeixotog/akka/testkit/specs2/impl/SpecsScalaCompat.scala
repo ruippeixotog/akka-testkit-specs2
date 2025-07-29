@@ -13,7 +13,7 @@ import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.GetMessageFunc
 import org.specs2.execute.Result
 import org.specs2.matcher.Matcher
 
-private[specs2] object CompatMatchers {
+private[specs2] object SpecsScalaCompat {
   type MatcherResult[S] = MatchResult[S]
   val okResult = ok
 

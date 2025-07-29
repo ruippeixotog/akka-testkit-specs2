@@ -8,13 +8,17 @@ import org.specs2.execute.{AsResult, Success}
 import org.specs2.matcher.Matchers._
 import org.specs2.matcher.{Expectable, Matcher, ValueCheck}
 import net.ruippeixotog.akka.testkit.specs2.impl.CompatImplicits._
-import net.ruippeixotog.akka.testkit.specs2.impl.CompatMatchers.{MatcherResult, okResult}
 
 import net.ruippeixotog.akka.testkit.specs2.{FailureValue, ResultValue, SuccessValue}
 import net.ruippeixotog.akka.testkit.specs2.ResultValue.{CheckFailed, ReceiveTimeout}
 import net.ruippeixotog.akka.testkit.specs2.Util._
 import net.ruippeixotog.akka.testkit.specs2.api._
-import net.ruippeixotog.akka.testkit.specs2.impl.CompatMatchers.{toMatcherResult, toValueCheck}
+import net.ruippeixotog.akka.testkit.specs2.impl.SpecsScalaCompat.{
+  MatcherResult,
+  okResult,
+  toMatcherResult,
+  toValueCheck
+}
 
 private[specs2] object Matchers {
 
