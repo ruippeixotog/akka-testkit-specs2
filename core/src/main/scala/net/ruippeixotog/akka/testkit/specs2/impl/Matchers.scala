@@ -10,10 +10,11 @@ import org.specs2.matcher.{Expectable, Matcher, ValueCheck}
 import net.ruippeixotog.akka.testkit.specs2.impl.CompatImplicits._
 import net.ruippeixotog.akka.testkit.specs2.impl.CompatMatchers.{MatcherResult, okResult}
 
+import net.ruippeixotog.akka.testkit.specs2.{FailureValue, ResultValue, SuccessValue}
 import net.ruippeixotog.akka.testkit.specs2.ResultValue.{CheckFailed, ReceiveTimeout}
 import net.ruippeixotog.akka.testkit.specs2.Util._
 import net.ruippeixotog.akka.testkit.specs2.api._
-import net.ruippeixotog.akka.testkit.specs2.{FailureValue, ResultValue, SuccessValue}
+import net.ruippeixotog.akka.testkit.specs2.impl.CompatMatchers.{toMatcherResult, toValueCheck}
 
 private[specs2] object Matchers {
 
@@ -24,7 +25,7 @@ private[specs2] object Matchers {
     def getMessage: GetMessageFunc[P, A]
 
     def apply[S <: P](t: Expectable[S]): MatcherResult[S] =
-      CompatMatchers.createMatcher(getMessage, t)
+      toMatcherResult(getMessage(t.value, tf(t.value)).result, t)
   }
 
   class FullReceiveMatcherImpl[P, A](val getMessage: GetMessageFunc[P, A])(implicit tf: TimeoutFunc[P])
@@ -98,7 +99,7 @@ private[specs2] object Matchers {
       extends ReceiveMatcherImpl[P, Seq[A]] {
 
     protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[P, A] =
-      CompatMatchers.getRemainingMessages(_getMessage, remMsgs)
+      _getMessage.andThen(_.mapCheck(toValueCheck(beOneOf[A](remMsgs *))))
 
     val getMessage = { (probe: P, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
