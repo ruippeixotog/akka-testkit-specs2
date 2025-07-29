@@ -13,7 +13,7 @@ import net.ruippeixotog.akka.testkit.specs2.api.ReceiveMatcher
 import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.TimeoutFunc
 import net.ruippeixotog.akka.testkit.specs2.impl.Matchers.GetMessageFunc
 
-object SpecsScalaCompat {
+private[specs2] object SpecsScalaCompat {
   type MatcherResult[_] = Result
 
   val okResult = ok

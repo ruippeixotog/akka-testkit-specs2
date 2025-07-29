@@ -4,7 +4,7 @@ import org.specs2.execute.AsResult
 import org.specs2.execute.Result
 import org.specs2.matcher.{Expectable, Matcher, ValueCheck, ValueChecks}
 
-object CompatImplicits {
+private[specs2] object CompatImplicits {
   // These pulls the needed implicits so that they can be imported with `._` in Scala 3 instead of `.given`
   implicit def partialfunctionIsValueCheck[T, R: AsResult]: Conversion[PartialFunction[T, R], ValueCheck[T]] =
     ValueChecks.partialfunctionIsValueCheck[T, R]
