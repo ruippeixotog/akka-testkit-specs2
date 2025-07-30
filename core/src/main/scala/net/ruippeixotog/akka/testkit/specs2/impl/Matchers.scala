@@ -103,7 +103,7 @@ private[specs2] object Matchers {
       extends ReceiveMatcherImpl[P, Seq[A]] {
 
     protected def getRemainingMessages(remMsgs: Seq[A]): GetMessageFunc[P, A] =
-      _getMessage.andThen(_.mapCheck(toValueCheck(beOneOf[A](remMsgs*))))
+      _getMessage.andThen(_.mapCheck(toValueCheck(beOneOf[A](remMsgs *))))
 
     val getMessage = { (probe: P, timeout: FiniteDuration) =>
       def now = System.nanoTime.nanos
