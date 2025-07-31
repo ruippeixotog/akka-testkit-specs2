@@ -6,17 +6,21 @@ import org.apache.pekko.actor.testkit.typed.scaladsl.ActorTestKit
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ResultMatchers
 import org.specs2.mutable.SpecificationLike
-import org.specs2.specification.{AfterAll, Scope}
+
+import net.ruippeixotog.akka.testkit.specs2.AfterAllCompat
+import net.ruippeixotog.akka.testkit.specs2.ScopeCompat
 
 class PekkoTypedMatchersSpec(implicit env: ExecutionEnv)
     extends SpecificationLike
     with PekkoTypedMatchers
     with ResultMatchers
-    with AfterAll {
+    with AfterAllCompat {
 
   val testKit = ActorTestKit()
 
-  abstract class ProbeTest[Msg] extends Scope {
+  def shutdownTestkit(): Unit = testKit.shutdownTestKit()
+
+  abstract class ProbeTest[Msg] extends ScopeCompat {
     val probe = testKit.createTestProbe[Msg]()
     val timeout = probe.remainingOrDefault
 
@@ -218,6 +222,4 @@ class PekkoTypedMatchersSpec(implicit env: ExecutionEnv)
       (probe must receiveMessageWithin(5.seconds)("hello")) must beSuccessful
     }
   }
-
-  def afterAll(): Unit = testKit.shutdownTestKit()
 }

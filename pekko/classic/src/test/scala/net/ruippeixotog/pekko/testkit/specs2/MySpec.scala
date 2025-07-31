@@ -3,6 +3,7 @@ package net.ruippeixotog.pekko.testkit.specs2
 import scala.concurrent.duration._
 
 import net.ruippeixotog.pekko.testkit.specs2.mutable.PekkoSpecification
+import org.apache.pekko.testkit.TestKitBase
 
 class MySpec extends PekkoSpecification {
   // testActor is not thread-safe; use `TestProbe` instances per example when possible!
@@ -44,7 +45,7 @@ class MySpec extends PekkoSpecification {
       this must receive[Envelope].unwrap(_.msg).which(_ must startWith("h"))
 
       testActor ! "hello" // ...and several combinations of the modifiers above
-      this must receiveWithin(1.second)[String].which(_ must startWith("h")).afterOthers
+      (this: TestKitBase) must receiveWithin(1.second)[String].which(_ must startWith("h")).afterOthers
     }
   }
 }

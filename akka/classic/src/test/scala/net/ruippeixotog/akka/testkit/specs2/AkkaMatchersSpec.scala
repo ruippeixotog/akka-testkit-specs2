@@ -7,16 +7,20 @@ import akka.testkit.{TestKit, TestProbe}
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.matcher.ResultMatchers
 import org.specs2.mutable.SpecificationLike
-import org.specs2.specification.{AfterAll, Scope}
+
+import net.ruippeixotog.akka.testkit.specs2.AfterAllCompat
+import net.ruippeixotog.akka.testkit.specs2.ScopeCompat
 
 class AkkaMatchersSpec(implicit env: ExecutionEnv)
     extends TestKit(ActorSystem())
     with SpecificationLike
     with AkkaMatchers
     with ResultMatchers
-    with AfterAll {
+    with AfterAllCompat {
 
-  abstract class ProbeTest extends Scope {
+  def shutdownTestkit(): Unit = shutdown()
+
+  abstract class ProbeTest extends ScopeCompat {
     val probe = TestProbe()
     val timeout = probe.remainingOrDefault
 
@@ -238,8 +242,8 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv)
 
     "work as expected with untyped function matchers and messages" in new ProbeTest {
       val matchTest = receive.like {
-        case str: String => str mustEqual "str"
-        case n: Int => n mustEqual 42
+        case str: String => str === "str"
+        case n: Int => n === 42
       }
 
       probe.ref ! "a"
@@ -250,6 +254,4 @@ class AkkaMatchersSpec(implicit env: ExecutionEnv)
       (probe must matchTest) must beFailing("Received message 'None' but undefined function for (None|'None')")
     }
   }
-
-  def afterAll(): Unit = shutdown()
 }
