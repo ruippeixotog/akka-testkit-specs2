@@ -1,3 +1,7 @@
+### 0.4.0 (Aug 1, 2025)
+
+Update Scala 3 version of akka-testkit-specs2 to specs2 v5.
+
 ### 0.3.5 (Jul 2, 2025)
 
 Fix incorrectly bumped Scala 3 version, reverting it to Scala 3.3 (LTS).
