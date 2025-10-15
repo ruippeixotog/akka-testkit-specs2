@@ -33,7 +33,7 @@ lazy val pekkoBundle = (project in file("pekko"))
 
 lazy val commonSettings = Seq(
   // format: off
-  crossScalaVersions := Seq("2.13.16", "3.3.6"),
+  crossScalaVersions := Seq("2.13.16", "3.3.7"),
 
   libraryDependencies ++= (
     CrossVersion.partialVersion(scalaVersion.value) match {
