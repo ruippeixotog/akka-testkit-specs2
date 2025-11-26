@@ -2,7 +2,7 @@ import ReleaseTransformations._
 
 ThisBuild / organization := "net.ruippeixotog"
 
-ThisBuild / scalaVersion := "2.13.17"
+ThisBuild / scalaVersion := "2.13.18"
 
 lazy val core = (project in file("core"))
   .settings(commonSettings)
@@ -33,7 +33,7 @@ lazy val pekkoBundle = (project in file("pekko"))
 
 lazy val commonSettings = Seq(
   // format: off
-  crossScalaVersions := Seq("2.13.17", "3.3.7"),
+  crossScalaVersions := Seq("2.13.18", "3.3.7"),
 
   libraryDependencies ++= (
     CrossVersion.partialVersion(scalaVersion.value) match {
