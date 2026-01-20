@@ -1,10 +1,14 @@
+### 0.4.1 (Jan 20, 2026)
+
+Improved reported error location in match failures (#311).
+
 ### 0.4.0 (Aug 1, 2025)
 
-Update Scala 3 version of akka-testkit-specs2 to specs2 v5.
+Updated Scala 3 version of akka-testkit-specs2 to specs2 v5.
 
 ### 0.3.5 (Jul 2, 2025)
 
-Fix incorrectly bumped Scala 3 version, reverting it to Scala 3.3 (LTS).
+Fixed incorrectly bumped Scala 3 version, reverting it to Scala 3.3 (LTS).
 
 ### 0.3.4 (Jun 26, 2025)
 
