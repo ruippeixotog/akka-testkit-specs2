@@ -1,3 +1,3 @@
 name := "pekko-testkit-specs2-classic"
 
-libraryDependencies ++= Seq("org.apache.pekko" %% "pekko-testkit" % "1.7.1")
+libraryDependencies ++= Seq("org.apache.pekko" %% "pekko-testkit" % "2.0.0")
